@@ -49,7 +49,6 @@
             animation: shipHover 3.5s infinite ease-in-out;
         }
 
-        /* Schwere, gepanzerte Seitenflügel links & rechts */
         .wing-mass-l {
             position: absolute;
             width: 80px; height: 60px;
@@ -73,7 +72,6 @@
             transition: background 0.5s ease;
         }
 
-        /* Massives, schweres Haupt-Chassis */
         .chassis-center {
             position: absolute;
             width: 140px;
@@ -90,7 +88,6 @@
             transition: background-color 0.5s ease;
         }
 
-        /* Standby-Energielinien aus dem Bild */
         .glow-stripe {
             width: 5px; height: 45px;
             background-color: #ff5500; 
@@ -99,7 +96,6 @@
             transition: all 0.5s ease;
         }
 
-        /* DIE 4 MASSIVEN TRIEBWERKSDÜSEN IM HECK (AUSGESCHALTET) */
         .thruster-matrix {
             position: absolute;
             width: 260px;
@@ -110,7 +106,6 @@
             box-sizing: border-box;
         }
 
-        /* Äußere, fette Triebwerksringe */
         .nozzle-outer {
             width: 36px; height: 36px;
             background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
@@ -123,7 +118,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
-        /* Innere, schlankere Triebwerksringe */
         .nozzle-inner {
             width: 26px; height: 24px;
             background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
@@ -137,7 +131,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
-        /* Das glimmende Innere der abgeschalteten Düsen */
         .nozzle-core {
             width: 60%;
             height: 60%;
@@ -148,7 +141,6 @@
             transition: all 0.5s ease;
         }
 
-        /* Animationen für das ruhige Hangar-Schweben und das tiefe Standby-Glühen */
         @keyframes shipHover {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-7px); }
@@ -181,7 +173,7 @@
     <div class="hud">
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR (NO LIMIT)</div>
-            <div class="credits"><span id="credit-count">0</span> 💳</div>
+            <div class="credits" id="credit-display">0 💳</div>
         </div>
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
@@ -223,6 +215,7 @@
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
+        // Startwerte festlegen
         let credits = 0;
         let mineSpeed = 1;
         let pName = sessionStorage.getItem('active_commander') || "Commander";
@@ -230,10 +223,21 @@
         const saveKey_credits = pName + "_credits";
         const saveKey_speed = pName + "_speed";
 
+        // KRISE GELÖST: Funktion aktualisiert das HUD vollkommen unabhängig von Speicher-Bugs
+        function updateScreen() {
+            const display = document.getElementById('credit-display');
+            if (display) {
+                display.innerText = credits.toLocaleString('de-DE') + " 💳";
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('player-name').innerText = pName;
 
+            // Aus dem Speicher laden
             const storedCredits = localStorage.getItem(saveKey_credits);
             const storedSpeed = localStorage.getItem(saveKey_speed);
 
             credits = storedCredits && !isNaN(parseInt(storedCredits)) ? parseInt(storedCredits) : 0;
+            mineSpeed = storedSpeed && !isNaN(parseInt(storedSpeed)) ? parseInt(storedSpeed) : 1;
+
