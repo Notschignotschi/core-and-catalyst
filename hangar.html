@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core & Catalyst - Start-Terminal</title>
+    <style>
+        @keyframes lavaGlow {
+            0% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
+            50% { text-shadow: 0 0 20px #ff6600, 0 0 40px #ff9900, 0 0 60px #ffcc00; color: #ff9900; }
+            100% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
+        }
+        @keyframes crystalPulse {
+            0% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
+            50% { text-shadow: 0 0 25px #00ffff, 0 0 50px #00ffff; color: #00ffff; transform: scale(1.1); }
+            100% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
+        }
+        body {
+            background-color: #05060a;
+            color: #e6e6e6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .screen { width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; text-align: center; }
+        .hidden { display: none !important; }
+        .title-container { font-size: 3rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; gap: 15px; user-select: none; }
+        .lava-text { animation: lavaGlow 3s infinite; font-family: 'Impact', sans-serif; }
+        .crystal-symbol { animation: crystalPulse 2s infinite; display: inline-block; font-size: 3.5rem; }
+        .progress-bar-container { width: 80%; height: 6px; background-color: #161824; border-radius: 3px; margin: 30px auto; overflow: hidden; border: 1px solid #333; }
+        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.05s linear; }
+        .auth-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 400px; margin: 0 auto; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; color: #ff6600; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 12px; background-color: #161824; border: 1px solid #444; border-radius: 6px; color: white; font-size: 16px; box-sizing: border-box; }
+        input:focus { border-color: #00ffcc; outline: none; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
+        .btn { background-color: #ff6600; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        .btn:hover { background-color: #ff8533; transform: translateY(-2px); }
+        .switch-link { color: #00ffcc; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <!-- LADEBILDSCHIRM BEIM WEBSITE-START -->
+    <div id="loading-screen" class="screen">
+        <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
+        <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px; text-transform: uppercase;">VERBINDE MIT DEM SERVER-ZENTRUM...</h3>
+        <div class="progress-bar-container"><div id="bar" class="progress-bar"></div></div>
+        <p style="color: #555; font-style: italic; font-size: 14px;">Lade Interface-Skins, Triebwerks-Shader und Login-Netzwerkknoten...</p>
+    </div>
+
+    <!-- SICHERHEITS-TERMINAL -->
+    <div id="auth-screen" class="screen hidden">
+        <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
+        
+        <div id="register-box" class="auth-box">
+            <h3 style="margin-top:0; color: white; letter-spacing: 1px;">ALLIANZ-REGISTRIERUNG</h3>
+            <div class="input-group"><label>COMMANDER-NAME</label><input type="text" id="reg-user" placeholder="z.B. Commander_X"></div>
+            <div class="input-group"><label>ZUGANGS-CODE (PASSWORT)</label><input type="password" id="reg-code" placeholder="****"></div>
+            <button class="btn" onclick="handleRegister()">ACCOUNT ANLEGEN</button>
+            <span class="switch-link" onclick="toggleAuth(false)">Bereits registriert? Hier einloggen</span>
+        </div>
+
+        <div id="login-box" class="auth-box hidden">
+            <h3 style="margin-top:0; color: white; letter-spacing: 1px;">SENATS-ZUGANG</h3>
+            <div class="input-group"><label>COMMANDER-NAME</label><input type="text" id="login-user"></div>
+            <div class="input-group"><label>ZUGANGS-CODE</label><input type="password" id="login-code"></div>
+            <button class="btn" onclick="handleLogin()">COCKPIT BETRETEN</button>
+            <span class="switch-link" onclick="toggleAuth(true)">Neuer Commander? Account erstellen</span>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            startInitialLoading();
+        });
+
+        function startInitialLoading() {
+            const statusText = document.getElementById('load-status');
+            const bar = document.getElementById('bar');
+            const steps = [
+                "LADE INTERFACE-ELEMENTE...",
+                "INITIALISIERE QUANTEN-NETZWERK...",
+                "SYNCHRONISIERE REAKTIVE SPIEGELUNG...",
+                "ÖFFNE INTEGRITÄTS-ZUGANG...",
+                "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
+            ];
+            let progress = 0; let stepIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += 2; bar.style.width = progress + "%";
+                if (progress % 22 === 0 && stepIndex < steps.length) { statusText.innerText = steps[stepIndex]; stepIndex++; }
+                if (progress >= 100) { 
+                    clearInterval(interval); 
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    if (localStorage.length > 0) toggleAuth(false);
+                }
+            }, 50);
+        }
+
+        function toggleAuth(showRegister) {
+            document.getElementById('register-box').classList.toggle('hidden', !showRegister);
+            document.getElementById('login-box').classList.toggle('hidden', showRegister);
+        }
+
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            if (!user || !code) return alert("Fehler: Bitte alle Felder ausfüllen!");
+            if (localStorage.getItem(user)) return alert("Fehler: Name bereits vergeben!");
+            localStorage.setItem(user, code);
+            alert("Account im Senats-Register angelegt!");
+            toggleAuth(false);
+            document.getElementById('login-user').value = user;
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const code = document.getElementById('login-code').value.trim();
+            if (localStorage.getItem(user) === code) {
+                sessionStorage.setItem('active_commander', user);
+                // GENIAL: Wir leiten ab jetzt auf hangar.html weiter!
+                window.location.href = "hangar.html"; 
+            } else {
+                alert("ZUGRIFF VERWEIGERT: Ungültiger Zugangscode!");
+            }
+        }
+    </script>
+</body>
+</html>
