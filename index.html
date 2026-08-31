@@ -147,7 +147,7 @@
             const code = document.getElementById('login-code').value.trim();
             
             if (localStorage.getItem(user) === code) {
-                // User-Session speichern und ab in den Hyperraum zu game.html!
+                // User-Session speichern und ab in den Hyperraum zu hangar.html!
                 sessionStorage.setItem('active_commander', user);
                 window.location.href = "hangar.html"; 
             } else {
