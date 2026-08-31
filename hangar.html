@@ -20,41 +20,112 @@
         .hud-block { text-align: center; }
         .credits { font-size: 22px; color: #00ffcc; font-weight: bold; }
         
-        /* HANGAR-VIEWPORT (KRISE-GESICHERT!) */
+        /* HANGAR-VIEWPORT (KRISE-GESICHERTES 2D-VEKTOR-COCKPIT) */
         #canvas-container { 
             width: 100%; 
             height: 300px; 
             min-height: 300px; 
-            background: #0b0d16; 
+            background: radial-gradient(circle, #141724 0%, #07080c 100%); 
             margin: 0 auto 15px auto; 
             max-width: 700px; 
             border-radius: 10px; 
             border: 1px solid #333; 
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
-            position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9); 
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
             overflow: hidden;
         }
 
-        /* BACKUP-HOLO (Falls 3D versagt) */
-        #backup-holo {
-            width: 120px;
-            height: 120px;
-            background-color: transparent;
-            border: 4px solid #ff6600;
-            border-radius: 50% 50% 0 50%;
-            transform: rotate(-45deg);
-            box-shadow: 0 0 20px #ff6600;
-            animation: holoFloat 2s infinite ease-in-out;
-            display: block;
+        /* DIE EPISCHE 2D-HECKANSICHT DEINES KREUZERS */
+        .spaceship-vector {
+            position: relative;
+            width: 180px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: shipHover 2.5s infinite ease-in-out;
+            transition: all 0.5s ease;
         }
 
-        @keyframes holoFloat {
-            0% { transform: rotate(-45deg) translateY(0px); box-shadow: 0 0 15px #ff6600; }
-            50% { transform: rotate(-45deg) translateY(-10px); box-shadow: 0 0 30px #ff9900; }
-            100% { transform: rotate(-45deg) translateY(0px); box-shadow: 0 0 15px #ff6600; }
+        /* Hauptflügel-Body (Matt-Anthrazit) */
+        .ship-body {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 90px solid transparent;
+            border-right: 90px solid transparent;
+            border-bottom: 50px solid #252833; /* Dynamische Hüllenfarbe */
+            top: 25px;
+            transition: border-bottom-color 0.5s ease;
+        }
+
+        /* Heck-Cockpit-Aufsatz */
+        .ship-cockpit {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background-color: #1a1c24;
+            border-radius: 8px 8px 0 0;
+            top: 15px;
+            border: 1px solid #3d4152;
+        }
+
+        /* Feurig-orange glühende Energieschlitze */
+        .energy-glow {
+            position: absolute;
+            width: 120px;
+            height: 4px;
+            background-color: #ff5500; /* Dynamische Glühfarbe */
+            box-shadow: 0 0 15px #ff5500;
+            top: 55px;
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+
+        /* Die fetten Haupttriebwerke im Heck */
+        .thrusters-container {
+            position: absolute;
+            display: flex;
+            gap: 25px;
+            top: 70px;
+        }
+
+        .thruster {
+            width: 22px;
+            height: 12px;
+            background-color: #333;
+            border-radius: 0 0 4px 4px;
+            position: relative;
+        }
+
+        /* Die giftgrüne Triebwerksflamme von hinten */
+        .engine-flame {
+            position: absolute;
+            width: 14px;
+            height: 20px;
+            background: linear-gradient(to bottom, #ff5500, transparent); /* Dynamischer Antriebsstrahl */
+            box-shadow: 0 0 15px #ff5500;
+            top: 12px;
+            left: 4px;
+            border-radius: 0 0 50% 50%;
+            animation: engineBurn 0.15s infinite ease-in-out;
+            transition: all 0.5s ease;
+        }
+
+        /* Animationen für Triebwerksflackern und Schweben */
+        @keyframes shipHover {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes engineBurn {
+            0% { height: 18px; opacity: 0.9; }
+            50% { height: 24px; opacity: 1; }
+            100% { height: 18px; opacity: 0.9; }
         }
         
         /* TROCKENDOCK INTERFACE CONTROLS */
@@ -62,22 +133,19 @@
         .dock-panel { flex: 1; background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
         .dock-panel h3 { margin: 0 0 10px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         
-        /* BUTTON STYLES */
         .btn-disabled { background-color: #222; color: #555; border: 1px solid #333; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: not-allowed; margin-bottom: 8px; }
         .btn-action { background-color: #ff6600; color: white; border: none; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 8px; transition: 0.2s; text-align: center; }
         .btn-action:hover { background-color: #ff8533; transform: scale(1.02); }
         
         .chat-frame { width: 100%; max-width: 700px; height: 180px; border: 1px solid #333; border-radius: 10px; overflow: hidden; background-color: #0f111a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
-    <!-- Three.js CDN für stabile 3D-Grafik -->
-    <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
     <h2>🛰️ RECHNER-HANGAR & GEFECHTSBRÜCKE</h2>
     <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus von: <span id="player-name" style="color:#00ffcc; font-weight:bold;">Commander</span> 👑</p>
 
-    <!-- DAS NO-LIMIT-HUD -->
+    <!-- LIVE HUD -->
     <div class="hud">
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR (NO LIMIT)</div>
@@ -93,10 +161,17 @@
         </div>
     </div>
 
-    <!-- KRISE-GESICHERTES HOLO-CONTAINER -->
+    <!-- KRISENSICHERER CANVAS: DEIN SCHIFF IN 2D VOR DEM HYPERRAUM -->
     <div id="canvas-container">
-        <!-- Das 2D-Holo-Schiff steht bereit, falls 3D blockiert wird -->
-        <div id="backup-holo"></div>
+        <div class="spaceship-vector" id="ship-vector">
+            <div class="ship-cockpit"></div>
+            <div class="ship-body" id="ship-body"></div>
+            <div class="energy-glow" id="energy-glow"></div>
+            <div class="thrusters-container">
+                <div class="thruster"><div class="engine-flame" id="flame-1"></div></div>
+                <div class="thruster"><div class="engine-flame" id="flame-2"></div></div>
+            </div>
+        </div>
     </div>
 
     <!-- TROCKENDOCK INTERFACE CONTROLS -->
@@ -109,89 +184,41 @@
         
         <div class="dock-panel">
             <h3>🎨 HÜLLEN-STRUKTUR & LACKIERUNG</h3>
-            <button class="btn-action" onclick="changeDesign('#3a3f50', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
-            <button class="btn-action" onclick="changeDesign('#11401f', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
-            <button class="btn-action" onclick="changeDesign('#153552', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+            <button class="btn-action" onclick="changeDesign('#252833', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+            <button class="btn-action" onclick="changeDesign('#0f3019', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
+            <button class="btn-action" onclick="changeDesign('#112840', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
         </div>
     </div>
 
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
-        // --- PROFI PERSISTENZ-SPEICHERUNG (Konto-Fix) ---
+        // PERSISTENZ-SPEICHERUNG (Konto-Sicherung)
         let pName = sessionStorage.getItem('active_commander') || "Commander";
         document.getElementById('player-name').innerText = pName;
 
-        // Wir erstellen für jeden User ein eigenes, dauerhaftes Speicher-Profil im Browser!
         const saveKey_credits = pName + "_credits";
         const saveKey_parts = pName + "_parts";
         const saveKey_speed = pName + "_speed";
 
-        // Werte aus dem Langzeit-Speicher laden oder bei 0 starten, wenn neu
         let credits = parseInt(localStorage.getItem(saveKey_credits)) || 0;
         let parts = parseInt(localStorage.getItem(saveKey_parts)) || 0;
         let mineSpeed = parseInt(localStorage.getItem(saveKey_speed)) || 1;
 
-        // HUD beim Start sofort auf die geladenen Werte setzen
+        // HUD Werte setzen
         document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
         document.getElementById('parts-count').innerText = parts;
         document.getElementById('speed-count').innerText = mineSpeed;
 
-        // Wirtschaftstaktung + Automatisches Speichern im Hintergrund
+        // Krypto-Mine Taktung
         setInterval(() => {
             credits += mineSpeed;
             document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
-            
-            // Jeden verdienten Credit sofort bombenfest auf der Festplatte sichern!
             localStorage.setItem(saveKey_credits, credits);
         }, 1000);
 
-        // SIGNAL-BRÜCKE FÜR CHEATS (Speichert Cheats jetzt auch sofort ab!)
+        // SIGNAL-BRÜCKE FÜR CHEATS
         window.addEventListener('message', function(e) {
             if(e.data.type === 'CHEAT') {
                 if (e.data.command === 'money') { credits += 1000000; localStorage.setItem(saveKey_credits, credits); }
                 if (e.data.command === 'parts') { parts = 999; document.getElementById('parts-count').innerText = parts; localStorage.setItem(saveKey_parts, parts); }
-                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; localStorage.setItem(saveKey_speed, mineSpeed); }
-                document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
-            }
-        });
-
-        // --- STABILE THREE.JS & BACKUP ENGINE ---
-        let scene, camera, renderer, ship, light1, light2, clock;
-        let use3D = true;
-
-        window.addEventListener('load', () => {
-            if(use3D) {
-                init3DEngine();
-            }
-        });
-
-        function init3DEngine() {
-            const container = document.getElementById('canvas-container');
-            if (!container) return;
-
-            try {
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-                camera.position.set(0, 0, 3.5);
-
-                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                renderer.setPixelRatio(window.devicePixelRatio);
-                container.appendChild(renderer.domElement);
-
-                // Wenn der Renderer erfolgreich gestartet ist, blenden wir das 2D-Backup aus!
-                document.getElementById('backup-holo').style.display = 'none';
-
-                const ambient = new THREE.AmbientLight(0x555555);
-                scene.add(ambient);
-                
-                light1 = new THREE.DirectionalLight(0xff6600, 2.0);
-                light1.position.set(5, 5, 5); 
-                scene.add(light1);
-                
-                light2 = new THREE.DirectionalLight(0x00ffcc, 1.2);
-                light2.position.set(-5, -5, 5); 
-                scene.add(light2);
-
-                const geometry = new THREE.ConeGeometry(0.5, 1.5, 4);
