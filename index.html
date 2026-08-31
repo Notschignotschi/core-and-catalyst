@@ -130,31 +130,34 @@
             document.getElementById('login-box').classList.toggle('hidden', showRegister);
         }
 
-       function handleRegister() {
+    function handleRegister() {
         const user = document.getElementById('reg-user').value.trim();
         const code = document.getElementById('reg-code').value.trim();
         if (!user || !code) return alert("Felder ausfüllen!");
-        if (localStorage.getItem('dc_acc_' + user)) return alert("Name vergeben!");
+        
+        // KORREKTUR: Wir nutzen den exakten Datenbrücken-Schlüssel für die DB!
+        if (localStorage.getItem('dc_password_' + user)) return alert("Name vergeben!");
     
-        localStorage.setItem('dc_acc_' + user, code); // Passwort account-spezifisch speichern
+        localStorage.setItem('dc_password_' + user, code); // Passwort in der DB verankern
         alert("Account erfolgreich angelegt!");
         toggleAuth(false);
         document.getElementById('login-user').value = user;
-    }
+        }
+
 
     function handleLogin() {
         const user = document.getElementById('login-user').value.trim();
         const code = document.getElementById('login-code').value.trim();
     
-        if (localStorage.getItem('dc_acc_' + user) === code) {
-            // DATENBRÜCKE ACTIVATED: Wir merken uns, welcher Commander einloggt!
+        // KORREKTUR: Liest jetzt haargenau den richtigen Account-Schlüssel aus
+        if (localStorage.getItem('dc_password_' + user) === code) {
             sessionStorage.setItem('active_commander', user);
-            // Direktes Weiterleiten zur Hangar-Seite
             window.location.href = "hangar.html";
         } else {
             alert("ZUGRIFF VERWEIGERT: Ungültiger Zugangscode!");
         }
     }
+
 </script>
 </body>
 </html>
