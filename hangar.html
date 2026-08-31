@@ -15,41 +15,23 @@
         }
         h2 { color: #ff6600; text-shadow: 0 0 10px rgba(255, 102, 0, 0.4); margin: 0 0 5px 0; letter-spacing: 1px; }
         
-        /* SPIEL HUD */
         .hud { background-color: #0f111a; border: 2px solid #00ffcc; border-radius: 10px; padding: 12px; max-width: 700px; margin: 0 auto 15px auto; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
         .hud-block { text-align: center; }
         .credits { font-size: 22px; color: #00ffcc; font-weight: bold; }
         
-        /* HANGAR-VIEWPORT (3D) */
         #canvas-container { width: 100%; height: 300px; background: radial-gradient(circle, #171b2a 0%, #07080c 100%); margin: 0 auto 15px auto; max-width: 700px; border-radius: 10px; border: 1px solid #333; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         
-        /* TROCKENDOCK INTERFACE CONTROLS */
         .dock-controls { max-width: 700px; margin: 0 auto 15px auto; display: flex; gap: 15px; justify-content: center; }
         .dock-panel { flex: 1; background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
         .dock-panel h3 { margin: 0 0 10px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         
-        /* BUTTON STYLES */
         .btn-disabled { background-color: #222; color: #555; border: 1px solid #333; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: not-allowed; margin-bottom: 8px; }
         .btn-action { background-color: #ff6600; color: white; border: none; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 8px; transition: 0.2s; text-align: center; }
         .btn-action:hover { background-color: #ff8533; transform: scale(1.02); }
         
-        /* CHAT SYSTEM */
-        .chat-container { max-width: 700px; margin: 0 auto; background-color: #0f111a; border: 1px solid #333; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .chat-header { background-color: #161824; padding: 10px; font-weight: bold; color: #ff6600; font-size: 13px; letter-spacing: 1px; border-bottom: 1px solid #222; }
-        .chat-box { height: 140px; padding: 15px; overflow-y: auto; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; }
-        .chat-input-area { display: flex; background-color: #161824; border-top: 1px solid #222; }
-        .chat-input { flex: 1; padding: 12px; background: transparent; border: none; color: white; font-size: 14px; }
-        .chat-input:focus { outline: none; }
-        .chat-send-btn { background: #ff6600; border: none; color: white; padding: 0 20px; font-weight: bold; cursor: pointer; }
-        
-        /* CHAT SYSTEM FARBEN */
-        .msg-system { color: #00ffcc; font-weight: bold; }
-        .msg-nova { color: #ff3333; }
-        .msg-aethel { color: #cc66ff; }
-        .msg-player { color: #ffcc00; font-weight: bold; }
-        .msg-mod { color: #ff00ff; font-weight: bold; }
+        /* DAS LIVE-IFRAME FÜR DAS SEPARATE CHAT-MODUL */
+        .chat-frame { width: 100%; max-width: 700px; height: 180px; border: 1px solid #333; border-radius: 10px; overflow: hidden; background-color: #0f111a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
-    <!-- Three.js für echte 3D-Grafik im Hangar -->
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
@@ -57,7 +39,6 @@
     <h2>🛰️ RECHNER-HANGAR & GEFECHTSBRÜCKE</h2>
     <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus von: <span id="player-name" style="color:#00ffcc; font-weight:bold;">Commander</span> 👑</p>
 
-    <!-- LIVE HUD -->
     <div class="hud">
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR (STUFE 5)</div>
@@ -73,37 +54,24 @@
         </div>
     </div>
 
-    <!-- 3D AREA: HIER WIRD DAS GEOMETRISCHE SCHIFF GERENDERT -->
     <div id="canvas-container"></div>
 
-    <!-- TROCKENDOCK LACKIER-PANEL -->
     <div class="dock-controls">
         <div class="dock-panel">
             <h3>🔧 ERWEITERTE KOMPONENTEN</h3>
             <button class="btn-disabled" disabled>🛍️ Teil #769: Kollisions-Railgun (Gesperrt)</button>
             <button class="btn-disabled" disabled>🛍️ Teil #421: Kryo-Schnitt-Matrix (Gesperrt)</button>
-            <div style="font-size: 11px; color: #555; text-align: center; font-style: italic;">Modul-Slots offline.</div>
         </div>
-        
         <div class="dock-panel">
             <h3>🎨 HÜLLEN-STRUKTUR & LACKIERUNG</h3>
-            <button class="btn-action" onclick="changeDesign(0x11131a, 0xff5500, 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+            <button class="btn-action" onclick="changeDesign(0x222530, 0xff5500, 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
             <button class="btn-action" onclick="changeDesign(0x0a2412, 0x00ff55, 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
             <button class="btn-action" onclick="changeDesign(0x0c1f30, 0x00ffcc, 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
         </div>
     </div>
 
-    <!-- GLOBAL CHAT -->
-    <div class="chat-container">
-        <div class="chat-header">📡 GLOBAL CHAT [SEKTOR 9]</div>
-        <div class="chat-box" id="chat-box">
-            <div><span class="msg-system">[SYSTEM]:</span> Hangar geladen. Quanten-Hologramm aktiv.</div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chat-field" placeholder="Nachricht senden oder /cheat eingeben..." onkeypress="if(event.key === 'Enter') sendMsg()">
-            <button class="chat-send-btn" onclick="sendMsg()">SENDEN</button>
-        </div>
-    </div>
+    <!-- DER INTEGRATIONS-KNOTEN FÜR DIE CHAT.HTML -->
+    <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
         let credits = 2390000;
@@ -113,7 +81,7 @@
 
         document.getElementById('player-name').innerText = pName;
 
-        // Krypto-Mine Taktung
+        // Wirtschaftstaktung
         setInterval(() => {
             if (credits < 5000000) {
                 credits += mineSpeed;
@@ -122,60 +90,56 @@
             }
         }, 1000);
 
-        // Salz-Nachrichten der Konkurrenz
-        const botMessages = [
-            { name: "Viper_Nova", class: "msg-nova", text: "Schon wieder One-Hit durch die Railgun?! Das Spiel ist verbuggt! 😡" },
-            { name: "Iron_Wall", class: "msg-aethel", text: "Meine Nano-Schilde regenerieren gar nicht mehr... Kryo-Matrix ist OP!" },
-            { name: "Mod_Apex", class: "msg-mod", text: "Kills vom Commander sind absolut legitim. Deal with it." }
-        ];
-        setInterval(() => {
-            const randomBot = botMessages[Math.floor(Math.random() * botMessages.length)];
-            appendChat(randomBot.name, randomBot.text, randomBot.class);
-        }, 7500);
-
-        // --- THREE.JS 3D ENGINE (REINER SCHIFFS-SCHWBEREFEKT) ---
+        // STABILE THREE.JS ENGINE
+        let ship, light1, light2;
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 1.2, 3.2);
+        camera.position.set(0, 1.5, 3.5);
+
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
 
-        const ambient = new THREE.AmbientLight(0x222222);
+        const ambient = new THREE.AmbientLight(0x444444);
         scene.add(ambient);
-        
-        let light1 = new THREE.DirectionalLight(0xff5500, 1.5); 
-        light1.position.set(5, 3, 5); 
-        scene.add(light1);
-        
-        let light2 = new THREE.DirectionalLight(0x00ffcc, 0.8); 
-        light2.position.set(-5, 2, -3); 
-        scene.add(light2);
+        light1 = new THREE.DirectionalLight(0xff5500, 2.0); light1.position.set(5, 5, 5); scene.add(light1);
+        light2 = new THREE.DirectionalLight(0x00ffcc, 1.0); light2.position.set(-5, 2, -3); scene.add(light2);
 
-        // Das schwebende Schiff (Hangar-Prototyp-Modell)
-        const geometry = new THREE.ConeGeometry(0.5, 1.6, 4);
-        const material = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.5, metalness: 0.8 });
-        const ship = new THREE.Mesh(geometry, material);
+        const geometry = new THREE.ConeGeometry(0.6, 1.8, 4);
+        const material = new THREE.MeshStandardMaterial({ color: 0x222530, roughness: 0.4, metalness: 0.8 });
+        ship = new THREE.Mesh(geometry, material);
         ship.rotation.x = Math.PI / 2;
         scene.add(ship);
 
-        // Farbwechsel-Funktion
-        function changeDesign(hullColor, glowColor, logMessage) {
-            ship.material.color.setHex(hullColor);
-            light1.color.setHex(glowColor);
-            appendChat("HANGAR-SYSTEM", `Lackierung geändert auf: ${logMessage}`, "msg-system");
-        }
-
-        // Elegante Hangar-Flugsimulation
         let clock = new THREE.Clock();
         function renderLoop() {
             requestview = requestAnimationFrame(renderLoop);
-            ship.rotation.z += 0.003; // Kontinuierliche langsame Drehung
-            ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.05; // Sanftes Schweben
+            if(ship) { ship.rotation.z += 0.003; ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.05; }
             renderer.render(scene, camera);
         }
         renderLoop();
 
-        // Chat & Cheats
-        function sendMsg() {
+        // SIGNAL-BRÜCKE ZWISCHEN CHAT UND HANGAR (Für Cheats und Logs)
+        window.addEventListener('message', function(e) {
+            if(e.data.type === 'CHEAT') {
+                if (e.data.command === 'money') { credits += 1000000; if(credits > 5000000) credits = 5000000; }
+                if (e.data.command === 'parts') { parts = 999; document.getElementById('parts-count').innerText = parts; }
+                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; }
+                document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
+            }
+        });
+
+        function changeDesign(hullColor, glowColor, logMessage) {
+            if(ship && light1) {
+                ship.material.color.setHex(hullColor);
+                light1.color.setHex(glowColor);
+                
+                // Wir funken den Text rüber an das separate Chat-Modul, damit es dort im Log steht!
+                const chatWindow = document.getElementById('chat-window').contentWindow;
+                chatWindow.postMessage({ type: 'LOG', message: logMessage }, '*');
+            }
+        }
+    </script>
+</body>
+</html>
