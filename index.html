@@ -130,30 +130,32 @@
             document.getElementById('login-box').classList.toggle('hidden', showRegister);
         }
 
-        function handleRegister() {
-            const user = document.getElementById('reg-user').value.trim();
-            const code = document.getElementById('reg-code').value.trim();
-            if (!user || !code) return alert("Fehler: Bitte alle Felder ausfüllen!");
-            if (localStorage.getItem(user)) return alert("Fehler: Dieser Name ist bereits vergeben!");
-            
-            localStorage.setItem(user, code);
-            alert("Account erfolgreich im Senats-Register angelegt! Du kannst dich jetzt einloggen.");
-            toggleAuth(false);
-            document.getElementById('login-user').value = user;
-        }
+       function handleRegister() {
+        const user = document.getElementById('reg-user').value.trim();
+        const code = document.getElementById('reg-code').value.trim();
+        if (!user || !code) return alert("Felder ausfüllen!");
+        if (localStorage.getItem('dc_acc_' + user)) return alert("Name vergeben!");
+    
+        localStorage.setItem('dc_acc_' + user, code); // Passwort account-spezifisch speichern
+        alert("Account erfolgreich angelegt!");
+        toggleAuth(false);
+        document.getElementById('login-user').value = user;
+    }
 
-        function handleLogin() {
-            const user = document.getElementById('login-user').value.trim();
-            const code = document.getElementById('login-code').value.trim();
-            
-            if (localStorage.getItem(user) === code) {
-                // User-Session speichern und ab in den Hyperraum zu hangar.html!
-                sessionStorage.setItem('active_commander', user);
-                window.location.href = "hangar.html"; 
-            } else {
-                alert("ZUGRIFF VERWEIGERT: Ungültiger Zugangscode oder Commander-Name!");
-            }
+    function handleLogin() {
+        const user = document.getElementById('login-user').value.trim();
+        const code = document.getElementById('login-code').value.trim();
+    
+        if (localStorage.getItem('dc_acc_' + user) === code) {
+            // DATENBRÜCKE ACTIVATED: Wir merken uns, welcher Commander einloggt!
+            sessionStorage.setItem('active_commander', user);
+            // Direktes Weiterleiten zur Hangar-Seite
+            window.location.href = "hangar.html";
+        } else {
+            alert("ZUGRIFF VERWEIGERT: Ungültiger Zugangscode!");
         }
-    </script>
+    }
+</script>
 </body>
 </html>
+
