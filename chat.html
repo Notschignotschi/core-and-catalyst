@@ -72,7 +72,7 @@
     <div class="chat-container">
         <div class="chat-header">📡 COMBAT TERMINAL [SEKTOR 4 - RECHNER-NEBEL]</div>
         <div class="chat-box" id="chat-box">
-            <div><span class="msg-system">[SYSTEM]:</span> Verbindung gesichert. Das Universum wartet auf dich, Commander.</div>
+            <div><span class="msg-system">[SYSTEM]:</span> Chat-Verschlüsselung aktiv. Keine unbefugten Signaturen im Sektor entdeckt.</div>
         </div>
         <div class="chat-input-area">
             <input type="text" class="chat-input" id="chat-field" placeholder="Nachricht senden oder /cheat eingeben...">
@@ -83,7 +83,7 @@
     <script>
         let pName = sessionStorage.getItem('active_commander') || "Commander";
 
-        // Signal an die Hauptseite funken
+        // Signal an die Hangar-Hauptseite funken (wichtig für Cheats!)
         function sendCheatToHangar(command, value) {
             window.parent.postMessage({ type: 'CHEAT', command: command, value: value }, '*');
         }
@@ -118,7 +118,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Logs von der Hauptseite empfangen
+        // Logs von der Hauptseite empfangen (z.B. bei Lackierungswechsel)
         window.addEventListener('message', function(e) {
             if(e.data.type === 'LOG') {
                 appendChat("HANGAR-SYSTEM", e.data.message, "msg-system");
