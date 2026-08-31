@@ -18,118 +18,222 @@
         /* LIVE HUD */
         .hud { background-color: #0f111a; border: 2px solid #00ffcc; border-radius: 10px; padding: 12px; max-width: 700px; margin: 0 auto 15px auto; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
         .hud-block { text-align: center; }
-        .credits { font-size: 24px; color: #00ffcc; font-weight: bold; }
+        .credits { font-size: 22px; color: #00ffcc; font-weight: bold; }
         
-        /* 3D VIEWPORT */
+        /* HANGAR-VIEWPORT */
         #canvas-container { 
             width: 100%; 
             height: 340px; 
-            background: radial-gradient(circle, #141724 0%, #07080c 100%); 
+            min-height: 340px; 
+            background: radial-gradient(circle, #1a1624 0%, #040508 100%); 
             margin: 0 auto 15px auto; 
             max-width: 700px; 
             border-radius: 10px; 
-            border: 1px solid #333; 
+            border: 1px solid #222; 
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
+
+        /* 🚀 DAS GEPANZERTE TRIEBWERKS-MONSTER IN SCHWEBENDEM STANDBY */
+        .spaceship-epic {
+            position: relative;
+            width: 320px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: shipHover 3.5s infinite ease-in-out;
+        }
+
+        /* Schwere, gepanzerte Seitenflügel links & rechts */
+        .wing-mass-l {
+            position: absolute;
+            width: 80px; height: 60px;
+            background: #252833;
+            left: 20px; top: 45px;
+            border-radius: 15px 0 0 10px;
+            transform: skewY(10deg);
+            border: 1px solid #333;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4);
+            transition: background 0.5s ease;
+        }
+        .wing-mass-r {
+            position: absolute;
+            width: 80px; height: 60px;
+            background: #252833;
+            right: 20px; top: 45px;
+            border-radius: 0 15px 10px 0;
+            transform: skewY(-10deg);
+            border: 1px solid #333;
+            box-shadow: inset 5px -5px 10px rgba(0,0,0,0.4);
+            transition: background 0.5s ease;
+        }
+
+        /* Massives, schweres Haupt-Chassis */
+        .chassis-center {
+            position: absolute;
+            width: 140px;
+            height: 85px;
+            background-color: #1b1d26;
+            border: 2px solid #3d4152;
+            border-radius: 12px 12px 6px 6px;
+            top: 35px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Standby-Energielinien aus dem Bild */
+        .glow-stripe {
+            width: 5px; height: 45px;
+            background-color: #ff5500; 
+            box-shadow: 0 0 12px #ff5500;
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+
+        /* DIE 4 MASSIVEN TRIEBWERKSDÜSEN IM HECK (AUSGESCHALTET) */
+        .thruster-matrix {
+            position: absolute;
+            width: 260px;
+            display: flex;
+            justify-content: space-between;
+            top: 60px;
+            padding: 0 5px;
+            box-sizing: border-box;
+        }
+
+        /* Äußere, fette Triebwerksringe */
+        .nozzle-outer {
+            width: 36px; height: 36px;
+            background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
+            border: 2px solid #2d303d;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        /* Innere, schlankere Triebwerksringe */
+        .nozzle-inner {
+            width: 26px; height: 24px;
+            background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
+            border: 2px solid #2d303d;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        /* Das glimmende Innere der abgeschalteten Düsen */
+        .nozzle-core {
+            width: 60%;
+            height: 60%;
+            background-color: #ff5500; 
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff5500, inset 0 0 5px #000;
+            animation: standbyPulse 2s infinite alternate ease-in-out;
+            transition: all 0.5s ease;
+        }
+
+        /* Animationen für das ruhige Hangar-Schweben und das tiefe Standby-Glühen */
+        @keyframes shipHover {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes standbyPulse {
+            0% { opacity: 0.5; filter: brightness(0.8); }
+            100% { opacity: 0.9; filter: brightness(1.2); }
+        }
+        
+        /* LACKIER PANELS */
+        .dock-controls { max-width: 700px; margin: 0 auto 15px auto; }
+        .dock-panel { background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
+        .dock-panel h3 { margin: 0 0 12px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; text-align: center; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
+        
+        .btn-action { background-color: #ff6600; color: white; border: none; padding: 10px 15px; font-size: 13px; border-radius: 5px; font-weight: bold; flex: 1; cursor: pointer; transition: 0.2s; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+        .btn-action:hover { background-color: #ff8533; transform: translateY(-1px); }
         
         .chat-frame { width: 100%; max-width: 700px; height: 180px; border: 1px solid #333; border-radius: 10px; overflow: hidden; background-color: #0f111a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
-    <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
     <h2>🛰️ RECHNER-HANGAR & GEFECHTSBRÜCKE</h2>
-    <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus: <span style="color:#00ffcc; font-weight:bold;">Aktiv</span> 👑</p>
+    <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus von: <span id="player-name" style="color:#00ffcc; font-weight:bold;">Commander</span> 👑</p>
 
     <!-- LIVE HUD -->
     <div class="hud">
         <div class="hud-block">
-            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR</div>
-            <div class="credits" id="credit-display">0 💳</div>
+            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR (NO LIMIT)</div>
+            <div class="credits"><span id="credit-count">0</span> 💳</div>
         </div>
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
-            <div style="color: #ff6600; font-weight: bold; font-size: 18px;">+<span id="speed-count">900</span> / Sek</div>
+            <div style="color: #ff6600; font-weight: bold; font-size: 18px;">+<span id="speed-count">1</span> / Sek</div>
         </div>
     </div>
 
-    <!-- HANGAR VIEWPORT FOR 3D MODEL -->
-    <div id="canvas-container"></div>
+    <!-- HANGAR VIEWPORT -->
+    <div id="canvas-container">
+        <div class="spaceship-epic" id="ship-vector">
+            <div class="wing-mass-l" id="w-left"></div>
+            <div class="wing-mass-r" id="w-right"></div>
+            <div class="chassis-center" id="s-chassis">
+                <div class="glow-stripe" id="glow-1"></div>
+                <div class="glow-stripe" id="glow-2"></div>
+            </div>
+            
+            <div class="thruster-matrix">
+                <div class="nozzle-outer"><div class="nozzle-core" id="core-1"></div></div>
+                <div class="nozzle-inner"><div class="nozzle-core" id="core-2"></div></div>
+                <div class="nozzle-inner"><div class="nozzle-core" id="core-3"></div></div>
+                <div class="nozzle-outer"><div class="nozzle-core" id="core-4"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LACKIERUNG-STEUERUNG -->
+    <div class="dock-controls">
+        <div class="dock-panel">
+            <h3>🎨 ALLIANZ-STRUKTUR & TRIEBWERKS-SHADER</h3>
+            <div class="btn-group">
+                <button class="btn-action" onclick="changeDesign('#252833', '#1b1d26', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Standby-Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+                <button class="btn-action" onclick="changeDesign('#0f3019', '#0b2112', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Standby Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
+                <button class="btn-action" onclick="changeDesign('#112840', '#0c1d33', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Standby Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+            </div>
+        </div>
+    </div>
 
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
-        let credits = 2390000;
-        let mineSpeed = 900;
-
-        function drawHUD() {
-            const element = document.getElementById('credit-display');
-            if (element) {
-                element.innerText = credits.toLocaleString('de-DE') + " 💳";
-            }
-        }
+        let credits = 0;
+        let mineSpeed = 1;
+        let pName = sessionStorage.getItem('active_commander') || "Commander";
+        
+        const saveKey_credits = pName + "_credits";
+        const saveKey_speed = pName + "_speed";
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('speed-count').innerText = mineSpeed;
-            drawHUD();
+            document.getElementById('player-name').innerText = pName;
 
-            setInterval(() => {
-                credits += mineSpeed;
-                drawHUD();
-            }, 1000);
-        });
+            const storedCredits = localStorage.getItem(saveKey_credits);
+            const storedSpeed = localStorage.getItem(saveKey_speed);
 
-        window.addEventListener('message', function(e) {
-            if(e.data.type === 'CHEAT') {
-                if (e.data.command === 'money') { credits += 1000000; }
-                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; }
-                drawHUD();
-            }
-        });
-
-        // --- THREE.JS 3D ENGINE (PERFEKTE SEITENANSICHT) ---
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        
-        // KAMERA-POSITION: Wir setzen die Kamera seitlich auf die X-Achse (X = 3.5), damit man das Schiff perfekt von der Flanke sieht
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(3.5, 0.3, 0); 
-        camera.lookAt(0, 0, 0); // Kamera blickt exakt zentriert auf die Mitte des Schiffs
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        // Lichteffekte passend für die Flankenbeleuchtung platziert
-        const light1 = new THREE.DirectionalLight(0xff5500, 2.0); light1.position.set(5, 3, 5); scene.add(light1);
-        const light2 = new THREE.DirectionalLight(0x00ffcc, 1.0); light2.position.set(-5, 2, -3); scene.add(light2);
-
-        // Das schwebende Geometrie-Schiff (Kegel-Form)
-        const geometry = new THREE.ConeGeometry(0.5, 2.0, 4);
-        const material = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.4, metalness: 0.8 });
-        const ship = new THREE.Mesh(geometry, material);
-        
-        // SCHIFFS-DREHUNG: Das Schiff liegt flach im Raum, die Spitze zeigt nach vorne (entlang der Z-Achse)
-        ship.rotation.x = Math.PI / 2; 
-        scene.add(ship);
-
-        let clock = new THREE.Clock();
-        function renderLoop() {
-            requestAnimationFrame(renderLoop);
-            if (ship) {
-                // Sanfte Drehung um die eigene Hochachse (Y-Achse im lokalen Raum)
-                ship.rotation.z += 0.005; 
-                // Elegantes Auf- und Ab-Schweben im Hangar-Standby
-                ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.06; 
-            }
-            renderer.render(scene, camera);
-        }
-        renderLoop();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-    </script>
-</body>
-</html>
+            credits = storedCredits && !isNaN(parseInt(storedCredits)) ? parseInt(storedCredits) : 0;
