@@ -10,7 +10,7 @@ const DB = {
     loadCredits: function() {
         const commander = this.getActiveCommander();
         const saved = localStorage.getItem('dc_credits_' + commander);
-        return saved !== null ? parseInt(saved) : 2390000; // Standard-Startwert
+        return saved !== null ? parseInt(saved) : 0; // Standard-Startwert
     },
 
     // Lädt die Minen-Geschwindigkeit spezifisch für den Account
