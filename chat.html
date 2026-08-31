@@ -63,8 +63,6 @@
             cursor: pointer;
         }
         .msg-system { color: #00ffcc; font-weight: bold; }
-        .msg-nova { color: #ff3333; }
-        .msg-aethel { color: #cc66ff; }
         .msg-player { color: #ffcc00; font-weight: bold; }
         .msg-mod { color: #ff00ff; font-weight: bold; }
     </style>
@@ -72,9 +70,9 @@
 <body>
 
     <div class="chat-container">
-        <div class="chat-header">📡 GLOBAL CHAT [SEKTOR 9]</div>
+        <div class="chat-header">📡 COMBAT TERMINAL [SEKTOR 4 - RECHNER-NEBEL]</div>
         <div class="chat-box" id="chat-box">
-            <div><span class="msg-system">[SYSTEM]:</span> Chat-Modul autonom geladen. Abhörsichere Verbindung steht.</div>
+            <div><span class="msg-system">[SYSTEM]:</span> Verbindung gesichert. Das Universum wartet auf dich, Commander.</div>
         </div>
         <div class="chat-input-area">
             <input type="text" class="chat-input" id="chat-field" placeholder="Nachricht senden oder /cheat eingeben...">
@@ -83,24 +81,12 @@
     </div>
 
     <script>
-        // Commander-Name aus der Haupt-Session ziehen
         let pName = sessionStorage.getItem('active_commander') || "Commander";
 
-        // Wirtschaftliche Werte an die Hangar-Hauptseite funken (wichtig für Cheats!)
+        // Signal an die Hauptseite funken
         function sendCheatToHangar(command, value) {
             window.parent.postMessage({ type: 'CHEAT', command: command, value: value }, '*');
         }
-
-        // Salz-Nachrichten-Generator
-        const botMessages = [
-            { name: "Viper_Nova", class: "msg-nova", text: "Schon wieder One-Hit durch die Railgun?! Das Spiel ist verbuggt! 😡" },
-            { name: "Iron_Wall", class: "msg-aethel", text: "Meine Nano-Schilde regenerieren gar nicht mehr... Kryo-Matrix ist OP!" },
-            { name: "Mod_Apex", class: "msg-mod", text: "Kills vom Commander sind absolut legitim. Deal with it." }
-        ];
-        setInterval(() => {
-            const randomBot = botMessages[Math.floor(Math.random() * botMessages.length)];
-            appendChat(randomBot.name, randomBot.text, randomBot.class);
-        }, 8000);
 
         function sendMsg() {
             const field = document.getElementById('chat-field');
@@ -132,7 +118,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Empfängt Signale von der Hauptseite (z.B. bei Lackierungswechsel)
+        // Logs von der Hauptseite empfangen
         window.addEventListener('message', function(e) {
             if(e.data.type === 'LOG') {
                 appendChat("HANGAR-SYSTEM", e.data.message, "msg-system");
