@@ -24,15 +24,37 @@
         #canvas-container { 
             width: 100%; 
             height: 300px; 
-            min-height: 300px; /* Erzwingt Sichtbarkeit */
+            min-height: 300px; 
             background: #0b0d16; 
             margin: 0 auto 15px auto; 
             max-width: 700px; 
             border-radius: 10px; 
             border: 1px solid #333; 
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
-            display: block;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
+        }
+
+        /* BACKUP-HOLO (Falls 3D versagt) */
+        #backup-holo {
+            width: 120px;
+            height: 120px;
+            background-color: transparent;
+            border: 4px solid #ff6600;
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 20px #ff6600;
+            animation: holoFloat 2s infinite ease-in-out;
+            display: block;
+        }
+
+        @keyframes holoFloat {
+            0% { transform: rotate(-45deg) translateY(0px); box-shadow: 0 0 15px #ff6600; }
+            50% { transform: rotate(-45deg) translateY(-10px); box-shadow: 0 0 30px #ff9900; }
+            100% { transform: rotate(-45deg) translateY(0px); box-shadow: 0 0 15px #ff6600; }
         }
         
         /* TROCKENDOCK INTERFACE CONTROLS */
@@ -71,8 +93,11 @@
         </div>
     </div>
 
-    <!-- 3D AREA -->
-    <div id="canvas-container"></div>
+    <!-- KRISE-GESICHERTES HOLO-CONTAINER -->
+    <div id="canvas-container">
+        <!-- Das 2D-Holo-Schiff steht bereit, falls 3D blockiert wird -->
+        <div id="backup-holo"></div>
+    </div>
 
     <!-- TROCKENDOCK INTERFACE CONTROLS -->
     <div class="dock-controls">
@@ -81,115 +106,92 @@
             <button class="btn-disabled" disabled>🛍️ Teil #769: Kollisions-Railgun (Gesperrt)</button>
             <button class="btn-disabled" disabled>🛍️ Teil #421: Kryo-Schnitt-Matrix (Gesperrt)</button>
         </div>
+        
         <div class="dock-panel">
             <h3>🎨 HÜLLEN-STRUKTUR & LACKIERUNG</h3>
-            <button class="btn-action" onclick="changeDesign(0x3a3f50, 0xff5500, 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
-            <button class="btn-action" onclick="changeDesign(0x11401f, 0x00ff55, 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
-            <button class="btn-action" onclick="changeDesign(0x153552, 0x00ffcc, 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+            <button class="btn-action" onclick="changeDesign('#3a3f50', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+            <button class="btn-action" onclick="changeDesign('#11401f', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
+            <button class="btn-action" onclick="changeDesign('#153552', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
         </div>
     </div>
 
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
-        let credits = 0;
-        let parts = 0;
-        let mineSpeed = 1;
+        // --- PROFI PERSISTENZ-SPEICHERUNG (Konto-Fix) ---
         let pName = sessionStorage.getItem('active_commander') || "Commander";
-
         document.getElementById('player-name').innerText = pName;
 
-        // Wirtschaftstaktung (+1 pro Sekunde)
+        // Wir erstellen für jeden User ein eigenes, dauerhaftes Speicher-Profil im Browser!
+        const saveKey_credits = pName + "_credits";
+        const saveKey_parts = pName + "_parts";
+        const saveKey_speed = pName + "_speed";
+
+        // Werte aus dem Langzeit-Speicher laden oder bei 0 starten, wenn neu
+        let credits = parseInt(localStorage.getItem(saveKey_credits)) || 0;
+        let parts = parseInt(localStorage.getItem(saveKey_parts)) || 0;
+        let mineSpeed = parseInt(localStorage.getItem(saveKey_speed)) || 1;
+
+        // HUD beim Start sofort auf die geladenen Werte setzen
+        document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
+        document.getElementById('parts-count').innerText = parts;
+        document.getElementById('speed-count').innerText = mineSpeed;
+
+        // Wirtschaftstaktung + Automatisches Speichern im Hintergrund
         setInterval(() => {
             credits += mineSpeed;
             document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
+            
+            // Jeden verdienten Credit sofort bombenfest auf der Festplatte sichern!
+            localStorage.setItem(saveKey_credits, credits);
         }, 1000);
 
-        // SIGNAL-BRÜCKE FÜR CHEATS
+        // SIGNAL-BRÜCKE FÜR CHEATS (Speichert Cheats jetzt auch sofort ab!)
         window.addEventListener('message', function(e) {
             if(e.data.type === 'CHEAT') {
-                if (e.data.command === 'money') { credits += 1000000; }
-                if (e.data.command === 'parts') { parts = 999; document.getElementById('parts-count').innerText = parts; }
-                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; }
+                if (e.data.command === 'money') { credits += 1000000; localStorage.setItem(saveKey_credits, credits); }
+                if (e.data.command === 'parts') { parts = 999; document.getElementById('parts-count').innerText = parts; localStorage.setItem(saveKey_parts, parts); }
+                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; localStorage.setItem(saveKey_speed, mineSpeed); }
                 document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
             }
         });
 
-        // --- DEFINITION DER GLOBALEN THREE.JS VARIABLEN ---
+        // --- STABILE THREE.JS & BACKUP ENGINE ---
         let scene, camera, renderer, ship, light1, light2, clock;
+        let use3D = true;
 
-        // ERST STARTEN WENN DIE SEITE VOLLSTÄNDIG GELADEN IST!
         window.addEventListener('load', () => {
-            init3DEngine();
+            if(use3D) {
+                init3DEngine();
+            }
         });
 
         function init3DEngine() {
             const container = document.getElementById('canvas-container');
             if (!container) return;
 
-            // 1. Szene & Kamera
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 3.5); // Kameraposition direkt von vorne fixiert
+            try {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.set(0, 0, 3.5);
 
-            // 2. Renderer mit absoluten Pixelmaßen füttern
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
 
-            // 3. Beleuchtung (Farben kräftiger gemacht für Sichtbarkeit)
-            const ambient = new THREE.AmbientLight(0x555555);
-            scene.add(ambient);
-            
-            light1 = new THREE.DirectionalLight(0xff6600, 2.0); // Kräftiges Orange
-            light1.position.set(5, 5, 5); 
-            scene.add(light1);
-            
-            light2 = new THREE.DirectionalLight(0x00ffcc, 1.2); // Kräftiges Cyan
-            light2.position.set(-5, -5, 5); 
-            scene.add(light2);
+                // Wenn der Renderer erfolgreich gestartet ist, blenden wir das 2D-Backup aus!
+                document.getElementById('backup-holo').style.display = 'none';
 
-            // 4. Das Raumschiff als rotierender Design-Kegel (Heller eingefärbt!)
-            const geometry = new THREE.ConeGeometry(0.5, 1.5, 4);
-            const material = new THREE.MeshStandardMaterial({ color: 0x4a4f5c, roughness: 0.3, metalness: 0.7 });
-            ship = new THREE.Mesh(geometry, material);
-            
-            // Aufrecht hinstellen und leicht nach vorne kippen für den 3D-Look
-            ship.rotation.x = Math.PI / 2.5; 
-            scene.add(ship);
-
-            // 5. Animations-Schleife starten
-            clock = new THREE.Clock();
-            function renderLoop() {
-                requestAnimationFrame(renderLoop);
-                if (ship) {
-                    ship.rotation.z += 0.005; // Schiff dreht sich majestätisch
-                }
-                renderer.render(scene, camera);
-            }
-            renderLoop();
-
-            // Automatischer Resize-Koppler
-            window.addEventListener('resize', () => {
-                if(container && camera && renderer) {
-                    camera.aspect = container.clientWidth / container.clientHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(container.clientWidth, container.clientHeight);
-                }
-            });
-        }
-
-        // Farbwechsel-Funktion
-        function changeDesign(hullColor, glowColor, logMessage) {
-            if(ship && light1) {
-                ship.material.color.setHex(hullColor);
-                light1.color.setHex(glowColor);
+                const ambient = new THREE.AmbientLight(0x555555);
+                scene.add(ambient);
                 
-                const chatWindow = document.getElementById('chat-window').contentWindow;
-                chatWindow.postMessage({ type: 'LOG', message: logMessage }, '*');
-            }
-        }
-    </script>
-</body>
-</html>
+                light1 = new THREE.DirectionalLight(0xff6600, 2.0);
+                light1.position.set(5, 5, 5); 
+                scene.add(light1);
+                
+                light2 = new THREE.DirectionalLight(0x00ffcc, 1.2);
+                light2.position.set(-5, -5, 5); 
+                scene.add(light2);
+
+                const geometry = new THREE.ConeGeometry(0.5, 1.5, 4);
