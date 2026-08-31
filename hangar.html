@@ -81,8 +81,8 @@
 
     <script>
         // Absolut krisensichere Startwerte direkt im Code verankert
-        let credits = 0; 
-        let mineSpeed = 100;   
+        let credits = typeof DB !== 'undefined' ? DB.loadCredits() : 0; 
+        let mineSpeed = typeof DB !== 'undefined' ? DB.loadSpeed() : 100;
 
         // Unfehlbare Update-Funktion für den Bildschirm
         function drawHUD() {
