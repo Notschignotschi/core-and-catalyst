@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core & Catalyst - Brücke</title>
+    <style>
+        @keyframes lavaGlow {
+            0% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
+            50% { text-shadow: 0 0 20px #ff6600, 0 0 40px #ff9900, 0 0 60px #ffcc00; color: #ff9900; }
+            100% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
+        }
+        @keyframes crystalPulse {
+            0% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
+            50% { text-shadow: 0 0 25px #00ffff, 0 0 50px #00ffff; color: #00ffff; transform: scale(1.1); }
+            100% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
+        }
+        body {
+            background-color: #05060a;
+            color: #e6e6e6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .screen {
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .hidden { display: none !important; }
+        .title-container {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .lava-text { animation: lavaGlow 3s infinite; font-family: 'Impact', sans-serif; }
+        .crystal-symbol { animation: crystalPulse 2s infinite; display: inline-block; font-size: 3.5rem; }
+        .auth-box {
+            background-color: #0f111a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; color: #ff6600; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #161824;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: #00ffcc; outline: none; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
+        .btn {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+        }
+        .btn:hover { background-color: #ff8533; transform: translateY(-2px); }
+        .switch-link { color: #00ffcc; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; }
+        .progress-bar-container {
+            width: 80%;
+            height: 6px;
+            background-color: #161824;
+            border-radius: 3px;
+            margin: 30px auto;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.1s linear; }
+        .hud {
+            background-color: #0f111a;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            padding: 15px;
+            max-width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        .credits { font-size: 26px; color: #00ffcc; font-weight: bold; }
+        #canvas-container { width: 100%; height: 350px; background: radial-gradient(circle, #141724 0%, #07080c 100%); margin: 20px auto; max-width: 600px; border-radius: 10px; border: 1px solid #333; position: relative; }
+        .dock { max-width: 600px; margin: 20px auto; background: #0f111a; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+    </style>
+    <script src="https://cloudflare.com"></script>
+</head>
+<body>
+
+    <!-- SCREEN 1: LOGIN & REGISTRIERUNG -->
+    <div id="auth-screen" class="screen">
+        <div class="title-container">
+            <span class="lava-text">CORE</span>
+            <span class="crystal-symbol">💠</span>
+            <span class="lava-text">CATALYST</span>
+        </div>
+        
+        <!-- REGISTRIERUNGS-BOX -->
+        <div id="register-box" class="auth-box">
+            <h3 style="margin-top:0; color: white;">ALLIANZ-REGISTRIERUNG</h3>
+            <div class="input-group">
+                <label>COMMANDER-NAME</label>
+                <input type="text" id="reg-user" placeholder="z.B. Commander_X">
+            </div>
+            <div class="input-group">
+                <label>ZUGANGS-CODE (PASSWORT)</label>
+                <input type="password" id="reg-code" placeholder="****">
+            </div>
+            <button class="btn" onclick="handleRegister()">ACCOUNT ANLEGEN</button>
+            <span class="switch-link" onclick="toggleAuth(false)">Bereits registriert? Hier einloggen</span>
+        </div>
+
+        <!-- LOGIN-BOX -->
+        <div id="login-box" class="auth-box hidden">
+            <h3 style="margin-top:0; color: white;">SENATS-ZUGANG</h3>
+            <div class="input-group">
+                <label>COMMANDER-NAME</label>
+                <input type="text" id="login-user">
+            </div>
+            <div class="input-group">
+                <label>ZUGANGS-CODE</label>
+                <input type="password" id="login-code">
+            </div>
+            <button class="btn" onclick="handleLogin()">COCKPIT BETRETEN</button>
+            <span class="switch-link" onclick="toggleAuth(true)">Neuer Commander? Account erstellen</span>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: LADEBILDSCHIRM -->
+    <div id="loading-screen" class="screen hidden">
+        <div class="title-container">
+            <span class="lava-text">CORE</span>
+            <span class="crystal-symbol">💠</span>
+            <span class="lava-text">CATALYST</span>
+        </div>
+        <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px;">INITIALISIERE QUANTEN-NETZWERK...</h3>
+        <div class="progress-bar-container">
+            <div id="bar" class="progress-bar"></div>
+        </div>
+        <p style="color: #666; font-style: italic;">Lade Sektor-9-Strukturdaten und Dorfchaoten-Beuteregister...</p>
+    </div>
+
+    <!-- SCREEN 3: DIE HAUPT-BRÜCKE (DAS SPIEL) -->
+    <div id="main-bridge" class="screen hidden">
+        <h2 style="color: #ff6600; margin: 0;">🚀 GEFECHTS-BRÜCKE</h2>
+        <p style="margin: 5px 0;">Willkommen zurück, Senator <span id="player-name" style="color:#00ffcc; font-weight:bold;"></span>!</p>
+
+        <div class="hud">
+            <div>KRYPTO-TRESOR (STUFE 5)</div>
+            <div class="credits"><span id="credit-count">2.390.000</span> / 5.000.000 💳</div>
+            <p style="margin:5px 0 0 0;">Einnahmen: <span style="color: #00ffcc;">+900 Credits/Sek</span></p>
+        </div>
+
+        <div id="canvas-container"></div>
+
+        <div class="dock">
+            <h3 style="color: #ff6600; margin: 0 0 5px 0;">🔧 Schiffs-Spezifikationen</h3>
+            <p style="color: #00ffcc; font-size: 18px; font-weight: bold; margin: 5px 0;">⚡ GÖTTER-KETTENBLITZ-KREUZER</p>
+            <p style="margin: 5px 0; font-size: 14px;">Modifikations-Liste: <span style="color:#ff6600; font-weight:bold;">37</span> / 1.000 Teilen aktiv</p>
+        </div>
+    </div>
+
+    <script>
+        // Variablen für die Wirtschaft
+        let credits = 2390000;
+        let gameActive = false;
+
+        // Wechsel zwischen Login und Register
+        function toggleAuth(showRegister) {
+            document.getElementById('register-box').classList.toggle('hidden', !showRegister);
+            document.getElementById('login-box').classList.toggle('hidden', showRegister);
+        }
+
+        // Registrierung
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+
+            if (!user || !code) return alert("Fehler: Felder dürfen nicht leer sein!");
+            if (localStorage.getItem(user)) return alert("Fehler: Name bereits vergeben!");
+
+            localStorage.setItem(user, code);
+            alert("Account erfolgreich angelegt! Du kannst dich jetzt einloggen.");
+            toggleAuth(false);
+            document.getElementById('login-user').value = user;
+        }
+
+        // Login
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const code = document.getElementById('login-code').value.trim();
+
+            const savedCode = localStorage.getItem(user);
+
+            if (savedCode && savedCode === code) {
+                startLoadingSequence(user);
+            } else {
+                alert("ZUGRIFF VERWEIGERT: Ungültiger Commander-Name oder Zugangscode!");
+            }
+        }
+
+        // Animierter Ladebildschirm
+        function startLoadingSequence(username) {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('loading-screen').classList.remove('hidden');
+
+            const statusText = document.getElementById('load-status');
+            const bar = document.getElementById('bar');
