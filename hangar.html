@@ -3,133 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core & Catalyst - Start-Terminal</title>
+    <title>Core & Catalyst - Hangar</title>
     <style>
-        @keyframes lavaGlow {
-            0% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
-            50% { text-shadow: 0 0 20px #ff6600, 0 0 40px #ff9900, 0 0 60px #ffcc00; color: #ff9900; }
-            100% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
+        body { 
+            background-color: #05060a; 
+            color: #e6e6e6; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            text-align: center; 
         }
-        @keyframes crystalPulse {
-            0% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
-            50% { text-shadow: 0 0 25px #00ffff, 0 0 50px #00ffff; color: #00ffff; transform: scale(1.1); }
-            100% { text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc; color: #00ffcc; transform: scale(1); }
-        }
-        body {
-            background-color: #05060a;
-            color: #e6e6e6;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .screen { width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; text-align: center; }
-        .hidden { display: none !important; }
-        .title-container { font-size: 3rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; gap: 15px; user-select: none; }
-        .lava-text { animation: lavaGlow 3s infinite; font-family: 'Impact', sans-serif; }
-        .crystal-symbol { animation: crystalPulse 2s infinite; display: inline-block; font-size: 3.5rem; }
-        .progress-bar-container { width: 80%; height: 6px; background-color: #161824; border-radius: 3px; margin: 30px auto; overflow: hidden; border: 1px solid #333; }
-        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.05s linear; }
-        .auth-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 400px; margin: 0 auto; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; color: #ff6600; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        input { width: 100%; padding: 12px; background-color: #161824; border: 1px solid #444; border-radius: 6px; color: white; font-size: 16px; box-sizing: border-box; }
-        input:focus { border-color: #00ffcc; outline: none; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
-        .btn { background-color: #ff6600; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-        .btn:hover { background-color: #ff8533; transform: translateY(-2px); }
-        .switch-link { color: #00ffcc; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; font-size: 14px; }
+        h2 { color: #ff6600; text-shadow: 0 0 10px rgba(255, 102, 0, 0.4); margin: 0 0 5px 0; letter-spacing: 1px; }
+        
+        /* SPIEL HUD */
+        .hud { background-color: #0f111a; border: 2px solid #00ffcc; border-radius: 10px; padding: 12px; max-width: 700px; margin: 0 auto 15px auto; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
+        .hud-block { text-align: center; }
+        .credits { font-size: 22px; color: #00ffcc; font-weight: bold; }
+        
+        /* HANGAR-VIEWPORT (3D) */
+        #canvas-container { width: 100%; height: 300px; background: radial-gradient(circle, #171b2a 0%, #07080c 100%); margin: 0 auto 15px auto; max-width: 700px; border-radius: 10px; border: 1px solid #333; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        
+        /* TROCKENDOCK INTERFACE CONTROLS */
+        .dock-controls { max-width: 700px; margin: 0 auto 15px auto; display: flex; gap: 15px; justify-content: center; }
+        .dock-panel { flex: 1; background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
+        .dock-panel h3 { margin: 0 0 10px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        /* BUTTON STYLES */
+        .btn-disabled { background-color: #222; color: #555; border: 1px solid #333; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: not-allowed; margin-bottom: 8px; }
+        .btn-action { background-color: #ff6600; color: white; border: none; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 8px; transition: 0.2s; text-align: center; }
+        .btn-action:hover { background-color: #ff8533; transform: scale(1.02); }
+        
+        /* CHAT SYSTEM */
+        .chat-container { max-width: 700px; margin: 0 auto; background-color: #0f111a; border: 1px solid #333; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .chat-header { background-color: #161824; padding: 10px; font-weight: bold; color: #ff6600; font-size: 13px; letter-spacing: 1px; border-bottom: 1px solid #222; }
+        .chat-box { height: 140px; padding: 15px; overflow-y: auto; text-align: left; font-size: 13px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; }
+        .chat-input-area { display: flex; background-color: #161824; border-top: 1px solid #222; }
+        .chat-input { flex: 1; padding: 12px; background: transparent; border: none; color: white; font-size: 14px; }
+        .chat-input:focus { outline: none; }
+        .chat-send-btn { background: #ff6600; border: none; color: white; padding: 0 20px; font-weight: bold; cursor: pointer; }
+        
+        /* CHAT SYSTEM FARBEN */
+        .msg-system { color: #00ffcc; font-weight: bold; }
+        .msg-nova { color: #ff3333; }
+        .msg-aethel { color: #cc66ff; }
+        .msg-player { color: #ffcc00; font-weight: bold; }
+        .msg-mod { color: #ff00ff; font-weight: bold; }
     </style>
+    <!-- Three.js für echte 3D-Grafik im Hangar -->
+    <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
-    <!-- LADEBILDSCHIRM BEIM WEBSITE-START -->
-    <div id="loading-screen" class="screen">
-        <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
-        <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px; text-transform: uppercase;">VERBINDE MIT DEM SERVER-ZENTRUM...</h3>
-        <div class="progress-bar-container"><div id="bar" class="progress-bar"></div></div>
-        <p style="color: #555; font-style: italic; font-size: 14px;">Lade Interface-Skins, Triebwerks-Shader und Login-Netzwerkknoten...</p>
+    <h2>🛰️ RECHNER-HANGAR & GEFECHTSBRÜCKE</h2>
+    <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus von: <span id="player-name" style="color:#00ffcc; font-weight:bold;">Commander</span> 👑</p>
+
+    <!-- LIVE HUD -->
+    <div class="hud">
+        <div class="hud-block">
+            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR (STUFE 5)</div>
+            <div class="credits"><span id="credit-count">2.390.000</span> / 5.000.000 💳</div>
+        </div>
+        <div class="hud-block">
+            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
+            <div style="color: #ff6600; font-weight: bold; font-size: 18px;">+<span id="speed-count">900</span> / Sek</div>
+        </div>
+        <div class="hud-block">
+            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">META-LISTE</div>
+            <div style="color: #00ffcc; font-weight: bold; font-size: 18px;"><span id="parts-count">37</span> / 1000</div>
+        </div>
     </div>
 
-    <!-- SICHERHEITS-TERMINAL -->
-    <div id="auth-screen" class="screen hidden">
-        <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
-        
-        <div id="register-box" class="auth-box">
-            <h3 style="margin-top:0; color: white; letter-spacing: 1px;">ALLIANZ-REGISTRIERUNG</h3>
-            <div class="input-group"><label>COMMANDER-NAME</label><input type="text" id="reg-user" placeholder="z.B. Commander_X"></div>
-            <div class="input-group"><label>ZUGANGS-CODE (PASSWORT)</label><input type="password" id="reg-code" placeholder="****"></div>
-            <button class="btn" onclick="handleRegister()">ACCOUNT ANLEGEN</button>
-            <span class="switch-link" onclick="toggleAuth(false)">Bereits registriert? Hier einloggen</span>
-        </div>
+    <!-- 3D AREA: HIER WIRD DAS GEOMETRISCHE SCHIFF GERENDERT -->
+    <div id="canvas-container"></div>
 
-        <div id="login-box" class="auth-box hidden">
-            <h3 style="margin-top:0; color: white; letter-spacing: 1px;">SENATS-ZUGANG</h3>
-            <div class="input-group"><label>COMMANDER-NAME</label><input type="text" id="login-user"></div>
-            <div class="input-group"><label>ZUGANGS-CODE</label><input type="password" id="login-code"></div>
-            <button class="btn" onclick="handleLogin()">COCKPIT BETRETEN</button>
-            <span class="switch-link" onclick="toggleAuth(true)">Neuer Commander? Account erstellen</span>
+    <!-- TROCKENDOCK LACKIER-PANEL -->
+    <div class="dock-controls">
+        <div class="dock-panel">
+            <h3>🔧 ERWEITERTE KOMPONENTEN</h3>
+            <button class="btn-disabled" disabled>🛍️ Teil #769: Kollisions-Railgun (Gesperrt)</button>
+            <button class="btn-disabled" disabled>🛍️ Teil #421: Kryo-Schnitt-Matrix (Gesperrt)</button>
+            <div style="font-size: 11px; color: #555; text-align: center; font-style: italic;">Modul-Slots offline.</div>
+        </div>
+        
+        <div class="dock-panel">
+            <h3>🎨 HÜLLEN-STRUKTUR & LACKIERUNG</h3>
+            <button class="btn-action" onclick="changeDesign(0x11131a, 0xff5500, 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+            <button class="btn-action" onclick="changeDesign(0x0a2412, 0x00ff55, 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
+            <button class="btn-action" onclick="changeDesign(0x0c1f30, 0x00ffcc, 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+        </div>
+    </div>
+
+    <!-- GLOBAL CHAT -->
+    <div class="chat-container">
+        <div class="chat-header">📡 GLOBAL CHAT [SEKTOR 9]</div>
+        <div class="chat-box" id="chat-box">
+            <div><span class="msg-system">[SYSTEM]:</span> Hangar geladen. Quanten-Hologramm aktiv.</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chat-field" placeholder="Nachricht senden oder /cheat eingeben..." onkeypress="if(event.key === 'Enter') sendMsg()">
+            <button class="chat-send-btn" onclick="sendMsg()">SENDEN</button>
         </div>
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            startInitialLoading();
-        });
+        let credits = 2390000;
+        let parts = 37;
+        let mineSpeed = 900;
+        let pName = sessionStorage.getItem('active_commander') || "Commander";
 
-        function startInitialLoading() {
-            const statusText = document.getElementById('load-status');
-            const bar = document.getElementById('bar');
-            const steps = [
-                "LADE INTERFACE-ELEMENTE...",
-                "INITIALISIERE QUANTEN-NETZWERK...",
-                "SYNCHRONISIERE REAKTIVE SPIEGELUNG...",
-                "ÖFFNE INTEGRITÄTS-ZUGANG...",
-                "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
-            ];
-            let progress = 0; let stepIndex = 0;
-            
-            const interval = setInterval(() => {
-                progress += 2; bar.style.width = progress + "%";
-                if (progress % 22 === 0 && stepIndex < steps.length) { statusText.innerText = steps[stepIndex]; stepIndex++; }
-                if (progress >= 100) { 
-                    clearInterval(interval); 
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('auth-screen').classList.remove('hidden');
-                    if (localStorage.length > 0) toggleAuth(false);
-                }
-            }, 50);
-        }
+        document.getElementById('player-name').innerText = pName;
 
-        function toggleAuth(showRegister) {
-            document.getElementById('register-box').classList.toggle('hidden', !showRegister);
-            document.getElementById('login-box').classList.toggle('hidden', showRegister);
-        }
-
-        function handleRegister() {
-            const user = document.getElementById('reg-user').value.trim();
-            const code = document.getElementById('reg-code').value.trim();
-            if (!user || !code) return alert("Fehler: Bitte alle Felder ausfüllen!");
-            if (localStorage.getItem(user)) return alert("Fehler: Name bereits vergeben!");
-            localStorage.setItem(user, code);
-            alert("Account im Senats-Register angelegt!");
-            toggleAuth(false);
-            document.getElementById('login-user').value = user;
-        }
-
-        function handleLogin() {
-            const user = document.getElementById('login-user').value.trim();
-            const code = document.getElementById('login-code').value.trim();
-            if (localStorage.getItem(user) === code) {
-                sessionStorage.setItem('active_commander', user);
-                // GENIAL: Wir leiten ab jetzt auf hangar.html weiter!
-                window.location.href = "hangar.html"; 
-            } else {
-                alert("ZUGRIFF VERWEIGERT: Ungültiger Zugangscode!");
+        // Krypto-Mine Taktung
+        setInterval(() => {
+            if (credits < 5000000) {
+                credits += mineSpeed;
+                if (credits > 5000000) credits = 5000000;
+                document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
             }
+        }, 1000);
+
+        // Salz-Nachrichten der Konkurrenz
+        const botMessages = [
+            { name: "Viper_Nova", class: "msg-nova", text: "Schon wieder One-Hit durch die Railgun?! Das Spiel ist verbuggt! 😡" },
+            { name: "Iron_Wall", class: "msg-aethel", text: "Meine Nano-Schilde regenerieren gar nicht mehr... Kryo-Matrix ist OP!" },
+            { name: "Mod_Apex", class: "msg-mod", text: "Kills vom Commander sind absolut legitim. Deal with it." }
+        ];
+        setInterval(() => {
+            const randomBot = botMessages[Math.floor(Math.random() * botMessages.length)];
+            appendChat(randomBot.name, randomBot.text, randomBot.class);
+        }, 7500);
+
+        // --- THREE.JS 3D ENGINE (REINER SCHIFFS-SCHWBEREFEKT) ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 1.2, 3.2);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const ambient = new THREE.AmbientLight(0x222222);
+        scene.add(ambient);
+        
+        let light1 = new THREE.DirectionalLight(0xff5500, 1.5); 
+        light1.position.set(5, 3, 5); 
+        scene.add(light1);
+        
+        let light2 = new THREE.DirectionalLight(0x00ffcc, 0.8); 
+        light2.position.set(-5, 2, -3); 
+        scene.add(light2);
+
+        // Das schwebende Schiff (Hangar-Prototyp-Modell)
+        const geometry = new THREE.ConeGeometry(0.5, 1.6, 4);
+        const material = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.5, metalness: 0.8 });
+        const ship = new THREE.Mesh(geometry, material);
+        ship.rotation.x = Math.PI / 2;
+        scene.add(ship);
+
+        // Farbwechsel-Funktion
+        function changeDesign(hullColor, glowColor, logMessage) {
+            ship.material.color.setHex(hullColor);
+            light1.color.setHex(glowColor);
+            appendChat("HANGAR-SYSTEM", `Lackierung geändert auf: ${logMessage}`, "msg-system");
         }
-    </script>
-</body>
-</html>
+
+        // Elegante Hangar-Flugsimulation
+        let clock = new THREE.Clock();
+        function renderLoop() {
+            requestview = requestAnimationFrame(renderLoop);
+            ship.rotation.z += 0.003; // Kontinuierliche langsame Drehung
+            ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.05; // Sanftes Schweben
+            renderer.render(scene, camera);
+        }
+        renderLoop();
+
+        // Chat & Cheats
+        function sendMsg() {
