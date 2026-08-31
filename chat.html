@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #0f111a;
+            color: #e6e6e6;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .chat-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #0f111a;
+            box-sizing: border-box;
+        }
+        .chat-header {
+            background-color: #161824;
+            padding: 10px;
+            font-weight: bold;
+            color: #ff6600;
+            font-size: 13px;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #222;
+            user-select: none;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-sizing: border-box;
+        }
+        .chat-input-area {
+            display: flex;
+            background-color: #161824;
+            border-top: 1px solid #222;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            background: #161824;
+            border: none;
+            color: white;
+            font-size: 14px;
+        }
+        .chat-input:focus { outline: none; }
+        .chat-send-btn {
+            background: #ff6600;
+            border: none;
+            color: white;
+            padding: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .msg-system { color: #00ffcc; font-weight: bold; }
+        .msg-nova { color: #ff3333; }
+        .msg-aethel { color: #cc66ff; }
+        .msg-player { color: #ffcc00; font-weight: bold; }
+        .msg-mod { color: #ff00ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">📡 GLOBAL CHAT [SEKTOR 9]</div>
+        <div class="chat-box" id="chat-box">
+            <div><span class="msg-system">[SYSTEM]:</span> Chat-Modul autonom geladen. Abhörsichere Verbindung steht.</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chat-field" placeholder="Nachricht senden oder /cheat eingeben...">
+            <button class="chat-send-btn" id="send-button">SENDEN</button>
+        </div>
+    </div>
+
+    <script>
+        // Commander-Name aus der Haupt-Session ziehen
+        let pName = sessionStorage.getItem('active_commander') || "Commander";
+
+        // Wirtschaftliche Werte an die Hangar-Hauptseite funken (wichtig für Cheats!)
+        function sendCheatToHangar(command, value) {
+            window.parent.postMessage({ type: 'CHEAT', command: command, value: value }, '*');
+        }
+
+        // Salz-Nachrichten-Generator
+        const botMessages = [
+            { name: "Viper_Nova", class: "msg-nova", text: "Schon wieder One-Hit durch die Railgun?! Das Spiel ist verbuggt! 😡" },
+            { name: "Iron_Wall", class: "msg-aethel", text: "Meine Nano-Schilde regenerieren gar nicht mehr... Kryo-Matrix ist OP!" },
+            { name: "Mod_Apex", class: "msg-mod", text: "Kills vom Commander sind absolut legitim. Deal with it." }
+        ];
+        setInterval(() => {
+            const randomBot = botMessages[Math.floor(Math.random() * botMessages.length)];
+            appendChat(randomBot.name, randomBot.text, randomBot.class);
+        }, 8000);
+
+        function sendMsg() {
+            const field = document.getElementById('chat-field');
+            const text = field.value.trim();
+            if (!text) return;
+
+            if (text.startsWith('/cheat ')) {
+                const cmd = text.substring(7);
+                if (cmd === 'money') sendCheatToHangar('money', 1000000);
+                if (cmd === 'parts') sendCheatToHangar('parts', 999);
+                if (cmd === 'speed') sendCheatToHangar('speed', 50000);
+                appendChat("CONSOLE", `Cheat "${cmd}" abgefeuert!`, "msg-mod");
+            } else {
+                appendChat(pName, text, "msg-player");
+            }
+            field.value = "";
+        }
+
+        document.getElementById('send-button').addEventListener('click', sendMsg);
+        document.getElementById('chat-field').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMsg();
+        });
+
+        function appendChat(user, msg, colorClass) {
+            const box = document.getElementById('chat-box');
+            const el = document.createElement('div');
+            el.innerHTML = `<span class="${colorClass}">[${user}]:</span> ${msg}`;
+            box.appendChild(el); 
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Empfängt Signale von der Hauptseite (z.B. bei Lackierungswechsel)
+        window.addEventListener('message', function(e) {
+            if(e.data.type === 'LOG') {
+                appendChat("HANGAR-SYSTEM", e.data.message, "msg-system");
+            }
+        });
+    </script>
+</body>
+</html>
