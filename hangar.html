@@ -15,22 +15,22 @@
         }
         h2 { color: #ff6600; text-shadow: 0 0 10px rgba(255, 102, 0, 0.4); margin: 0 0 5px 0; letter-spacing: 1px; }
         
-        /* SPIEL HUD */
+        /* LIVE HUD */
         .hud { background-color: #0f111a; border: 2px solid #00ffcc; border-radius: 10px; padding: 12px; max-width: 700px; margin: 0 auto 15px auto; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
         .hud-block { text-align: center; }
         .credits { font-size: 22px; color: #00ffcc; font-weight: bold; }
         
-        /* HANGAR-VIEWPORT (KRISE-GESICHERTES 2D-VEKTOR-COCKPIT) */
+        /* HANGAR-VIEWPORT */
         #canvas-container { 
             width: 100%; 
-            height: 300px; 
-            min-height: 300px; 
-            background: radial-gradient(circle, #141724 0%, #07080c 100%); 
+            height: 340px; 
+            min-height: 340px; 
+            background: radial-gradient(circle, #1a1624 0%, #040508 100%); 
             margin: 0 auto 15px auto; 
             max-width: 700px; 
             border-radius: 10px; 
-            border: 1px solid #333; 
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.9); 
+            border: 1px solid #222; 
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9); 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,104 +38,136 @@
             overflow: hidden;
         }
 
-        /* DIE EPISCHE 2D-HECKANSICHT DEINES KREUZERS */
-        .spaceship-vector {
+        /* 🚀 DAS GEPANZERTE TRIEBWERKS-MONSTER IN SCHWEBENDEM STANDBY */
+        .spaceship-epic {
             position: relative;
-            width: 180px;
-            height: 100px;
+            width: 320px;
+            height: 160px;
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: shipHover 2.5s infinite ease-in-out;
-            transition: all 0.5s ease;
+            animation: shipHover 3.5s infinite ease-in-out;
         }
 
-        /* Hauptflügel-Body (Matt-Anthrazit) */
-        .ship-body {
+        /* Schwere, gepanzerte Seitenflügel links & rechts */
+        .wing-mass-l {
             position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 90px solid transparent;
-            border-right: 90px solid transparent;
-            border-bottom: 50px solid #252833; /* Dynamische Hüllenfarbe */
-            top: 25px;
-            transition: border-bottom-color 0.5s ease;
+            width: 80px; height: 60px;
+            background: #252833;
+            left: 20px; top: 45px;
+            border-radius: 15px 0 0 10px;
+            transform: skewY(10deg);
+            border: 1px solid #333;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4);
+            transition: background 0.5s ease;
+        }
+        .wing-mass-r {
+            position: absolute;
+            width: 80px; height: 60px;
+            background: #252833;
+            right: 20px; top: 45px;
+            border-radius: 0 15px 10px 0;
+            transform: skewY(-10deg);
+            border: 1px solid #333;
+            box-shadow: inset 5px -5px 10px rgba(0,0,0,0.4);
+            transition: background 0.5s ease;
         }
 
-        /* Heck-Cockpit-Aufsatz */
-        .ship-cockpit {
+        /* Massives, schweres Haupt-Chassis */
+        .chassis-center {
             position: absolute;
-            width: 40px;
-            height: 25px;
-            background-color: #1a1c24;
-            border-radius: 8px 8px 0 0;
-            top: 15px;
-            border: 1px solid #3d4152;
+            width: 140px;
+            height: 85px;
+            background-color: #1b1d26;
+            border: 2px solid #3d4152;
+            border-radius: 12px 12px 6px 6px;
+            top: 35px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            transition: background-color 0.5s ease;
         }
 
-        /* Feurig-orange glühende Energieschlitze */
-        .energy-glow {
-            position: absolute;
-            width: 120px;
-            height: 4px;
-            background-color: #ff5500; /* Dynamische Glühfarbe */
-            box-shadow: 0 0 15px #ff5500;
-            top: 55px;
+        /* Standby-Energielinien aus dem Bild */
+        .glow-stripe {
+            width: 5px; height: 45px;
+            background-color: #ff5500; 
+            box-shadow: 0 0 12px #ff5500;
             border-radius: 2px;
             transition: all 0.5s ease;
         }
 
-        /* Die fetten Haupttriebwerke im Heck */
-        .thrusters-container {
+        /* DIE 4 MASSIVEN TRIEBWERKSDÜSEN IM HECK (AUSGESCHALTET) */
+        .thruster-matrix {
             position: absolute;
+            width: 260px;
             display: flex;
-            gap: 25px;
-            top: 70px;
+            justify-content: space-between;
+            top: 60px;
+            padding: 0 5px;
+            box-sizing: border-box;
         }
 
-        .thruster {
-            width: 22px;
-            height: 12px;
-            background-color: #333;
-            border-radius: 0 0 4px 4px;
+        /* Äußere, fette Triebwerksringe */
+        .nozzle-outer {
+            width: 36px; height: 36px;
+            background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
+            border: 2px solid #2d303d;
+            border-radius: 50%;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
-        /* Die giftgrüne Triebwerksflamme von hinten */
-        .engine-flame {
-            position: absolute;
-            width: 14px;
-            height: 20px;
-            background: linear-gradient(to bottom, #ff5500, transparent); /* Dynamischer Antriebsstrahl */
-            box-shadow: 0 0 15px #ff5500;
-            top: 12px;
-            left: 4px;
-            border-radius: 0 0 50% 50%;
-            animation: engineBurn 0.15s infinite ease-in-out;
+        /* Innere, schlankere Triebwerksringe */
+        .nozzle-inner {
+            width: 26px; height: 24px;
+            background: radial-gradient(circle, #2a2a2a 0%, #111 100%);
+            border: 2px solid #2d303d;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        /* Das glimmende Innere der abgeschalteten Düsen */
+        .nozzle-core {
+            width: 60%;
+            height: 60%;
+            background-color: #ff5500; 
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff5500, inset 0 0 5px #000;
+            animation: standbyPulse 2s infinite alternate ease-in-out;
             transition: all 0.5s ease;
         }
 
-        /* Animationen für Triebwerksflackern und Schweben */
+        /* Animationen für das ruhige Hangar-Schweben und das tiefe Standby-Glühen */
         @keyframes shipHover {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-7px); }
             100% { transform: translateY(0px); }
         }
 
-        @keyframes engineBurn {
-            0% { height: 18px; opacity: 0.9; }
-            50% { height: 24px; opacity: 1; }
-            100% { height: 18px; opacity: 0.9; }
+        @keyframes standbyPulse {
+            0% { opacity: 0.5; filter: brightness(0.8); }
+            100% { opacity: 0.9; filter: brightness(1.2); }
         }
         
-        /* TROCKENDOCK INTERFACE CONTROLS */
-        .dock-controls { max-width: 700px; margin: 0 auto 15px auto; display: flex; gap: 15px; justify-content: center; }
-        .dock-panel { flex: 1; background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
-        .dock-panel h3 { margin: 0 0 10px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        /* LACKIER PANELS */
+        .dock-controls { max-width: 700px; margin: 0 auto 15px auto; }
+        .dock-panel { background: #0f111a; border: 1px solid #222; padding: 15px; border-radius: 10px; text-align: left; }
+        .dock-panel h3 { margin: 0 0 12px 0; color: #ff6600; font-size: 14px; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 5px; text-align: center; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
         
-        .btn-disabled { background-color: #222; color: #555; border: 1px solid #333; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: not-allowed; margin-bottom: 8px; }
-        .btn-action { background-color: #ff6600; color: white; border: none; padding: 8px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 8px; transition: 0.2s; text-align: center; }
-        .btn-action:hover { background-color: #ff8533; transform: scale(1.02); }
+        .btn-action { background-color: #ff6600; color: white; border: none; padding: 10px 15px; font-size: 13px; border-radius: 5px; font-weight: bold; flex: 1; cursor: pointer; transition: 0.2s; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+        .btn-action:hover { background-color: #ff8533; transform: translateY(-1px); }
         
         .chat-frame { width: 100%; max-width: 700px; height: 180px; border: 1px solid #333; border-radius: 10px; overflow: hidden; background-color: #0f111a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
@@ -155,70 +187,53 @@
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
             <div style="color: #ff6600; font-weight: bold; font-size: 18px;">+<span id="speed-count">1</span> / Sek</div>
         </div>
-        <div class="hud-block">
-            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">META-LISTE</div>
-            <div style="color: #00ffcc; font-weight: bold; font-size: 18px;"><span id="parts-count">0</span> / 1000</div>
-        </div>
     </div>
 
-    <!-- KRISENSICHERER CANVAS: DEIN SCHIFF IN 2D VOR DEM HYPERRAUM -->
+    <!-- HANGAR VIEWPORT -->
     <div id="canvas-container">
-        <div class="spaceship-vector" id="ship-vector">
-            <div class="ship-cockpit"></div>
-            <div class="ship-body" id="ship-body"></div>
-            <div class="energy-glow" id="energy-glow"></div>
-            <div class="thrusters-container">
-                <div class="thruster"><div class="engine-flame" id="flame-1"></div></div>
-                <div class="thruster"><div class="engine-flame" id="flame-2"></div></div>
+        <div class="spaceship-epic" id="ship-vector">
+            <div class="wing-mass-l" id="w-left"></div>
+            <div class="wing-mass-r" id="w-right"></div>
+            <div class="chassis-center" id="s-chassis">
+                <div class="glow-stripe" id="glow-1"></div>
+                <div class="glow-stripe" id="glow-2"></div>
+            </div>
+            
+            <div class="thruster-matrix">
+                <div class="nozzle-outer"><div class="nozzle-core" id="core-1"></div></div>
+                <div class="nozzle-inner"><div class="nozzle-core" id="core-2"></div></div>
+                <div class="nozzle-inner"><div class="nozzle-core" id="core-3"></div></div>
+                <div class="nozzle-outer"><div class="nozzle-core" id="core-4"></div></div>
             </div>
         </div>
     </div>
 
-    <!-- TROCKENDOCK INTERFACE CONTROLS -->
+    <!-- LACKIERUNG-STEUERUNG -->
     <div class="dock-controls">
         <div class="dock-panel">
-            <h3>🔧 ERWEITERTE KOMPONENTEN</h3>
-            <button class="btn-disabled" disabled>🛍️ Teil #769: Kollisions-Railgun (Gesperrt)</button>
-            <button class="btn-disabled" disabled>🛍️ Teil #421: Kryo-Schnitt-Matrix (Gesperrt)</button>
-        </div>
-        
-        <div class="dock-panel">
-            <h3>🎨 HÜLLEN-STRUKTUR & LACKIERUNG</h3>
-            <button class="btn-action" onclick="changeDesign('#252833', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
-            <button class="btn-action" onclick="changeDesign('#0f3019', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
-            <button class="btn-action" onclick="changeDesign('#112840', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+            <h3>🎨 ALLIANZ-STRUKTUR & TRIEBWERKS-SHADER</h3>
+            <div class="btn-group">
+                <button class="btn-action" onclick="changeDesign('#252833', '#1b1d26', '#ff5500', 'Dorfchaoten-Original (Matt-Anthrazit & Standby-Orange)')">✨ Dorfchaoten (Anthrazit/Orange)</button>
+                <button class="btn-action" onclick="changeDesign('#0f3019', '#0b2112', '#00ff55', 'Viper-Overdrive (Nova-Giftgrün Standby Modus)')">🐍 Viper-Style (Nova-Giftgrün)</button>
+                <button class="btn-action" onclick="changeDesign('#112840', '#0c1d33', '#00ffcc', 'Amboss-Titanpanzerung (Neon-Cyan Standby Modus)')">🛡️ Amboss-Style (Neon-Cyan)</button>
+            </div>
         </div>
     </div>
 
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
-        // PERSISTENZ-SPEICHERUNG (Konto-Sicherung)
+        let credits = 0;
+        let mineSpeed = 1;
         let pName = sessionStorage.getItem('active_commander') || "Commander";
-        document.getElementById('player-name').innerText = pName;
-
+        
         const saveKey_credits = pName + "_credits";
-        const saveKey_parts = pName + "_parts";
         const saveKey_speed = pName + "_speed";
 
-        let credits = parseInt(localStorage.getItem(saveKey_credits)) || 0;
-        let parts = parseInt(localStorage.getItem(saveKey_parts)) || 0;
-        let mineSpeed = parseInt(localStorage.getItem(saveKey_speed)) || 1;
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('player-name').innerText = pName;
 
-        // HUD Werte setzen
-        document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
-        document.getElementById('parts-count').innerText = parts;
-        document.getElementById('speed-count').innerText = mineSpeed;
+            const storedCredits = localStorage.getItem(saveKey_credits);
+            const storedSpeed = localStorage.getItem(saveKey_speed);
 
-        // Krypto-Mine Taktung
-        setInterval(() => {
-            credits += mineSpeed;
-            document.getElementById('credit-count').innerText = credits.toLocaleString('de-DE');
-            localStorage.setItem(saveKey_credits, credits);
-        }, 1000);
-
-        // SIGNAL-BRÜCKE FÜR CHEATS
-        window.addEventListener('message', function(e) {
-            if(e.data.type === 'CHEAT') {
-                if (e.data.command === 'money') { credits += 1000000; localStorage.setItem(saveKey_credits, credits); }
-                if (e.data.command === 'parts') { parts = 999; document.getElementById('parts-count').innerText = parts; localStorage.setItem(saveKey_parts, parts); }
+            credits = storedCredits && !isNaN(parseInt(storedCredits)) ? parseInt(storedCredits) : 0;
