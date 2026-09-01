@@ -37,14 +37,8 @@
         /* LADEBALKEN STYLE */
         .progress-bar-container { width: 80%; height: 6px; background-color: #161824; border-radius: 3px; margin: 30px auto; overflow: hidden; border: 1px solid #333; }
         
-        /* HIER WURDE DIE ANIMATION HINZUGEFÜGT: */
-        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; animation: automatischesLaden 3s linear infinite; }
-        
-        /* DIESE REGEL IST NEU HINZUGEKOMMEN: */
-        @keyframes automatischesLaden {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
+        /* Das CSS steuert hier nur das Aussehen und die flüssige Bewegung */
+        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.1s linear; }
         
         /* LOGIN & REGISTRIERUNGS BOXEN */
         .auth-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 400px; margin: 0 auto; }
@@ -59,19 +53,17 @@
 </head>
 <body>
 
-    <!-- PHASE 1: HIER IST DEIN LADEBILDSCHIRM (HTML-SKELETT) -->
+    <!-- PHASE 1: HIER IST DEIN LADEBILDSCHIRM -->
     <div id="loading-screen" class="screen">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px; text-transform: uppercase;">VERBINDE MIT DEM SERVER-ZENTRUM...</h3>
-        <!-- Das hier ist der Container für den Ladebalken -->
         <div class="progress-bar-container">
-            <!-- Das hier ('id="bar"') ist der Balken, den wir mit JavaScript füllen! -->
             <div id="bar" class="progress-bar"></div>
         </div>
         <p style="color: #555; font-style: italic; font-size: 14px;">Lade Interface-Skins, Triebwerks-Shader und Login-Netzwerkknoten...</p>
     </div>
 
-    <!-- PHASE 2: TERMINAL (DAS WIRD PER JAVASCRIPT SICHTBAR GEMACHT) -->
+    <!-- PHASE 2: TERMINAL (WIRD NACH DEM LADEN SICHTBAR) -->
     <div id="auth-screen" class="screen hidden">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         
@@ -94,18 +86,16 @@
         </div>
     </div>
 
-    <!-- 🧠 DAS HIER IST DAS GEHIRN (JAVASCRIPT) - ES ERWECKT DEN BALKEN ZUM LEBEN -->
+    <!-- JAVASCRIPT LOGIK -->
     <script>
-        // Krisensicherer Sofortstart: Wir rufen die Ladefunktion direkt auf!
         startInitialLoading();
 
         function startInitialLoading() {
-            // JavaScript sucht im HTML nach der ID 'load-status' (dein Text)
             const statusText = document.getElementById('load-status');
-            // JavaScript sucht im HTML nach der ID 'bar' (dein Ladebalken)
             const bar = document.getElementById('bar');
+            const loadingScreen = document.getElementById('loading-screen');
+            const authScreen = document.getElementById('auth-screen');
             
-            // Die Texte, die beim Laden durchwechseln sollen
             const steps = [
                 "LADE INTERFACE-ELEMENTE...",
                 "INITIALISIERE QUANTEN-NETZWERK...",
@@ -114,70 +104,53 @@
                 "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
             ];
             
-            let progress = 0;   // Wir starten bei 0% Fortschritt
-            let stepIndex = 0;  // Wir starten beim ersten Text in der Liste
+            let progress = 0;   
             
-            // Eine Zeitschleife, die alle 10 Millisekunden (= blitzschnell) feuert
+            // Interval erhöht den Fortschritt alle 60ms um 2%
             const interval = setInterval(() => {
-                progress += 2; // Erhöhe den Fortschritt bei jedem kleinen Tick um 2%
+                progress += 2; 
                 
-                // Hier verändern wir die Breite des HTML-Balkens!
                 if (bar) {
                     bar.style.width = progress + "%"; 
                 }
                 
-                // Alle 22% ändern wir den Text im HTML
-                if (progress % 22 === 0 && stepIndex < steps.length) { 
-                    if (statusText) {
-                        statusText.innerText = steps[stepIndex]; // Schreibt den neuen Text rein
-                    }
-                    stepIndex++; 
+                // Wechselt die Statusnachrichten synchron zum Fortschritt
+                let stepIndex = Math.floor((progress / 100) * steps.length);
+                if (stepIndex >= steps.length) stepIndex = steps.length - 1;
+                
+                if (statusText && steps[stepIndex]) {
+                    statusText.innerText = steps[stepIndex];
                 }
                 
-                // Sobald 100% erreicht sind, stoppen wir das Laden
+                // Sobald 100% erreicht sind, stoppen und umschalten
                 if (progress >= 100) { 
-                    clearInterval(interval); // Stoppt diese Zeitschleife
+                    clearInterval(interval); 
                     
-                    // Jetzt verstecken wir den Ladebildschirm im HTML
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    // Und machen das Terminal-Hauptfenster sichtbar!
-                    document.getElementById('auth-screen').classList.remove('hidden');
-                    
-                    // Prüfen, ob Passwörter im Speicher existieren
-                    let hasAccounts = false;
-                    for (let i = 0; i < localStorage.length; i++) {
-                        if (localStorage.key(i).startsWith('dc_password_')) {
-                            hasAccounts = true;
-                            break;
-                        }
-                    }
-
-                    // Deine pure Logik entscheidet, welche Box wir sehen wollen
-                    if (hasAccounts) {
-                        toggleAuth(false); // Zeige direkt den Login
-                    } else {
-                        toggleAuth(true);  // Zeige die Registrierung
-                    }
+                    // Kurze Pause bei vollem Balken, dann Screen-Wechsel
+                    setTimeout(() => {
+                        if (loadingScreen) loadingScreen.classList.add('hidden');
+                        if (authScreen) authScreen.classList.remove('hidden');
+                    }, 400);
                 }
-            }, 10); // Die '10' sorgt dafür, dass es superschnell lädt!
+            }, 60); 
         }
 
-        // Steuert, ob Registrierung oder Login sichtbar ist (Deine If-Else Logik)
+        // Steuert das Umschalten zwischen Login- und Registrierungs-Box
         function toggleAuth(showRegister) {
-            document.getElementById('auth-screen').classList.remove('hidden');
-
-            if (showRegister === true) {
-                document.getElementById('register-box').classList.remove('hidden'); // Registrierung zeigen
-                document.getElementById('login-box').classList.add('hidden');       // Login verstecken
+            const regBox = document.getElementById('register-box');
+            const loginBox = document.getElementById('login-box');
+            if (showRegister) {
+                regBox.classList.remove('hidden');
+                loginBox.classList.add('hidden');
             } else {
-                document.getElementById('register-box').classList.add('hidden');    // Registrierung verstecken
-                document.getElementById('login-box').classList.remove('hidden');    // Login zeigen
+                regBox.classList.add('hidden');
+                loginBox.classList.remove('hidden');
             }
         }
 
-        // Wird aufgerufen, wenn man auf "ACCOUNT ANLEGEN" klickt
-        function handleRegister() {
-            const user = document.getElementById('reg-user').value.trim();
-            const code = document.getElementById('reg-code').value.trim();
-            
-            if (!user || !code) return alert("Felder ausfüllen!");
+        // Dummys für die Buttons, um Fehler in der Konsole zu vermeiden
+        function handleRegister() { alert("Registrierung abgesendet!"); }
+        function handleLogin() { alert("Login versucht!"); }
+    </script>
+</body>
+</html>
