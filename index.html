@@ -53,9 +53,17 @@
         }
 
         function toggleAuth(showRegister) {
-            document.getElementById('register-box').classList.toggle('hidden', !showRegister);
-            document.getElementById('login-box').classList.toggle('hidden', showRegister);
+            if (showRegister === true) {
+                // Wir wollen die Registrierung SEHEN:
+                document.getElementById('register-box').classList.remove('hidden'); // NICHT verstecken
+                document.getElementById('login-box').classList.add('hidden');       // Verstecken
+            } else {
+                // Wir wollen den Login SEHEN:
+                document.getElementById('register-box').classList.add('hidden');    // Verstecken
+                document.getElementById('login-box').classList.remove('hidden');    // NICHT verstecken
+            }
         }
+
 
         function handleRegister() {
             const user = document.getElementById('reg-user').value.trim();
