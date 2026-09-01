@@ -91,12 +91,18 @@
             <h2 style="color: #00ffcc; margin-top: 0; letter-spacing: 2px;">HANGAR-KONTROLLE</h2>
             <p style="font-size: 18px;">Willkommen zurück, <strong id="commander-display" style="color: #ff6600;">Commander</strong>!</p>
             <hr style="border: 1px solid #333; margin: 20px 0;">
-            <p style="color: #a6a6a6;">Deine Raumschiff-Flotte wird geladen... Bereit für den nächsten Hyperraumsprung.</p>
+            <div style="text-align: left; margin: 15px auto; max-width: 300px;">
+                <p>💰 Credits: <strong id="credits-display" style="color: #00ffcc;">0</strong></p>
+                <p>⚡ Minen-Tempo: <strong id="speed-display" style="color: #00ffcc;">0</strong> / Sek</p>
+            </div>
             <button class="btn" style="background-color: #333; margin-top: 20px;" onclick="logout()">TERMINAL VERLASSEN</button>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIK -->
+    <!-- Hier binden wir deine bestehende Datenbank-Datei ein -->
+    <script src="database.js"></script>
+
+    <!-- UI & Login Logik -->
     <script>
         startInitialLoading();
 
@@ -115,20 +121,13 @@
             ];
             
             let progress = 0;   
-            
             const interval = setInterval(() => {
                 progress += 2; 
-                
-                if (bar) {
-                    bar.style.width = progress + "%"; 
-                }
+                if (bar) bar.style.width = progress + "%"; 
                 
                 let stepIndex = Math.floor((progress / 100) * steps.length);
                 if (stepIndex >= steps.length) stepIndex = steps.length - 1;
-                
-                if (statusText && steps[stepIndex]) {
-                    statusText.innerText = steps[stepIndex];
-                }
+                if (statusText && steps[stepIndex]) statusText.innerText = steps[stepIndex];
                 
                 if (progress >= 100) { 
                     clearInterval(interval); 
@@ -152,39 +151,29 @@
             }
         }
 
-        function enterHangar(username) {
+        // Lädt die Daten des Commanders und schaltet das Hangar-UI frei
+        function enterHangar() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('hangar-screen').classList.remove('hidden');
-            document.getElementById('commander-display').innerText = username;
+            
+            // Name und geladene Werte aus der database.js im UI eintragen
+            document.getElementById('commander-display').innerText = DB.getActiveCommander();
+            document.getElementById('credits-display').innerText = DB.loadCredits();
+            document.getElementById('speed-display').innerText = DB.loadSpeed();
         }
 
-        // NEU: Holt die Account-Datenbank aus dem Speicher oder erstellt eine neue
-        function getAccounts() {
-            const accounts = localStorage.getItem('cc_accounts');
-            return accounts ? JSON.parse(accounts) : {};
+        // Hilfsfunktion: Holt die Accountliste für die Registrierung/Login-Prüfung
+        function getLocalAccounts() {
+            const saved = localStorage.getItem('cc_auth_database');
+            return saved ? JSON.parse(saved) : {};
         }
 
-        // NEU: Registrierungs-Logik mit Speicherung
+        // Registrierungs-Logik
         function handleRegister() { 
             const username = document.getElementById('reg-user').value.trim();
             const code = document.getElementById('reg-code').value;
 
-            if(!username || !code) {
-                return alert("Bitte fülle alle Felder aus!");
-            }
+            if(!username || !code) return alert("Bitte alle Felder ausfüllen!");
 
-            const accounts = getAccounts();
-
-            // Prüfen, ob der Name schon vergeben ist
-            if (accounts[username.toLowerCase()]) {
-                return alert("Dieser Commander-Name ist bereits registriert!");
-            }
-
-            // Account speichern
-            accounts[username.toLowerCase()] = {
-                name: username,
-                password: code
-            };
-            localStorage.setItem('cc_accounts', JSON.stringify(accounts));
-
-            alert("Account erfolgreich im Allianz-Register gespeichert!");
+            const accounts = getLocalAccounts();
+            if(accounts[username.toLowerCase()]) {
