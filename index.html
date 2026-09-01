@@ -36,12 +36,10 @@
         
         /* LADEBALKEN STYLE */
         .progress-bar-container { width: 80%; height: 6px; background-color: #161824; border-radius: 3px; margin: 30px auto; overflow: hidden; border: 1px solid #333; }
-        
-        /* Das CSS steuert hier nur das Aussehen und die flüssige Bewegung */
         .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.1s linear; }
         
-        /* LOGIN & REGISTRIERUNGS BOXEN */
-        .auth-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 400px; margin: 0 auto; }
+        /* LOGIN & REGISTRIERUNGS BOXEN / HANGAR */
+        .auth-box, .hangar-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 500px; margin: 0 auto; }
         .input-group { margin-bottom: 20px; text-align: left; }
         label { display: block; color: #ff6600; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
         input { width: 100%; padding: 12px; background-color: #161824; border: 1px solid #444; border-radius: 6px; color: white; font-size: 16px; box-sizing: border-box; }
@@ -53,7 +51,7 @@
 </head>
 <body>
 
-    <!-- PHASE 1: HIER IST DEIN LADEBILDSCHIRM -->
+    <!-- PHASE 1: LADEBILDSCHIRM -->
     <div id="loading-screen" class="screen">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px; text-transform: uppercase;">VERBINDE MIT DEM SERVER-ZENTRUM...</h3>
@@ -63,7 +61,7 @@
         <p style="color: #555; font-style: italic; font-size: 14px;">Lade Interface-Skins, Triebwerks-Shader und Login-Netzwerkknoten...</p>
     </div>
 
-    <!-- PHASE 2: TERMINAL (WIRD NACH DEM LADEN SICHTBAR) -->
+    <!-- PHASE 2: TERMINAL (AUTH SCREEN) -->
     <div id="auth-screen" class="screen hidden">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         
@@ -83,6 +81,18 @@
             <div class="input-group"><label>ZUGANGS-CODE</label><input type="password" id="login-code"></div>
             <button class="btn" onclick="handleLogin()">COCKPIT BETRETEN</button>
             <span class="switch-link" onclick="toggleAuth(true)">Neuer Commander? Account erstellen</span>
+        </div>
+    </div>
+
+    <!-- PHASE 3: NEU HINZUGEFÜGT - DER HANGAR-SCREEN -->
+    <div id="hangar-screen" class="screen hidden">
+        <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
+        <div class="hangar-box">
+            <h2 style="color: #00ffcc; margin-top: 0; letter-spacing: 2px;">HANGAR-KONTROLLE</h2>
+            <p style="font-size: 18px;">Willkommen zurück, <strong id="commander-display" style="color: #ff6600;">Commander</strong>!</p>
+            <hr style="border: 1px solid #333; margin: 20px 0;">
+            <p style="color: #a6a6a6;">Deine Raumschiff-Flotte wird geladen... Bereit für den nächsten Hyperraumsprung.</p>
+            <button class="btn" style="background-color: #333; margin-top: 20px;" onclick="logout()">TERMINAL VERLASSEN</button>
         </div>
     </div>
 
@@ -106,7 +116,6 @@
             
             let progress = 0;   
             
-            // Interval erhöht den Fortschritt alle 60ms um 2%
             const interval = setInterval(() => {
                 progress += 2; 
                 
@@ -114,7 +123,6 @@
                     bar.style.width = progress + "%"; 
                 }
                 
-                // Wechselt die Statusnachrichten synchron zum Fortschritt
                 let stepIndex = Math.floor((progress / 100) * steps.length);
                 if (stepIndex >= steps.length) stepIndex = steps.length - 1;
                 
@@ -122,11 +130,8 @@
                     statusText.innerText = steps[stepIndex];
                 }
                 
-                // Sobald 100% erreicht sind, stoppen und umschalten
                 if (progress >= 100) { 
                     clearInterval(interval); 
-                    
-                    // Kurze Pause bei vollem Balken, dann Screen-Wechsel
                     setTimeout(() => {
                         if (loadingScreen) loadingScreen.classList.add('hidden');
                         if (authScreen) authScreen.classList.remove('hidden');
@@ -135,7 +140,6 @@
             }, 60); 
         }
 
-        // Steuert das Umschalten zwischen Login- und Registrierungs-Box
         function toggleAuth(showRegister) {
             const regBox = document.getElementById('register-box');
             const loginBox = document.getElementById('login-box');
@@ -148,9 +152,36 @@
             }
         }
 
-        // Dummys für die Buttons, um Fehler in der Konsole zu vermeiden
-        function handleRegister() { alert("Registrierung abgesendet!"); }
-        function handleLogin() { alert("Login versucht!"); }
+        // NEU: Diese Funktion leitet dich in den Hangar weiter
+        function enterHangar(username) {
+            const authScreen = document.getElementById('auth-screen');
+            const hangarScreen = document.getElementById('hangar-screen');
+            const displayName = document.getElementById('commander-display');
+
+            if(displayName && username) {
+                displayName.innerText = username; // Setzt den Namen im Hangar ein
+            }
+
+            if(authScreen) authScreen.classList.add('hidden');
+            if(hangarScreen) hangarScreen.classList.remove('hidden');
+        }
+
+        function handleRegister() { 
+            const username = document.getElementById('reg-user').value;
+            if(!username) return alert("Bitte einen Commander-Namen eingeben!");
+            enterHangar(username); 
+        }
+
+        function handleLogin() { 
+            const username = document.getElementById('login-user').value;
+            if(!username) return alert("Bitte einen Commander-Namen eingeben!");
+            enterHangar(username); 
+        }
+
+        function logout() {
+            document.getElementById('hangar-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
