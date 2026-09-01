@@ -91,17 +91,19 @@
             <h2 style="color: #00ffcc; margin-top: 0; letter-spacing: 2px;">HANGAR-KONTROLLE</h2>
             <p style="font-size: 18px;">Willkommen zurück, <strong id="commander-display" style="color: #ff6600;">Commander</strong>!</p>
             <hr style="border: 1px solid #333; margin: 20px 0;">
+            
             <div style="text-align: left; margin: 15px auto; max-width: 300px;">
                 <p>💰 Credits: <strong id="credits-display" style="color: #00ffcc;">0</strong></p>
-                <p>⚡ Minen-Tempo: <strong id="speed-display" style="color: #00ffcc;">0</strong> / Sek</p>
+                <p>⚡ Minen-Tempo: <strong id="speed-display" style="color: #00ffcc;">0</strong> / Klick</p>
             </div>
-            <button class="btn" style="background-color: #333; margin-top: 20px;" onclick="logout()">TERMINAL VERLASSEN</button>
+
+            <button class="btn" style="margin-bottom: 15px;" onclick="mineCredits()">MINEN STARTEN (+Credits)</button>
+            <button class="btn" style="background-color: #333;" onclick="logout()">TERMINAL VERLASSEN</button>
         </div>
     </div>
 
-    <!-- ALLES IN EINEM: DEINE INTERNE CLOUD- & UI-LOGIK -->
+    <!-- INTEGRIERTE DATENBANK & SPIELLOGIK -->
     <script>
-        // 📡 DEIN ORIGINALER CODE AUS DATABASE.JS DIREKT INTEGRIERT
         const DB = {
             getActiveCommander: function() {
                 return sessionStorage.getItem('active_commander') || "Gast_Commander";
@@ -123,7 +125,7 @@
             }
         };
 
-        // 🚀 SOFORTIGER START DES LADEBALKENS (Nichts kann es mehr blockieren!)
+        // 🚀 KORRIGIERTER LADEBALKEN (Läuft jetzt flüssig durch)
         startInitialLoading();
 
         function startInitialLoading() {
@@ -141,6 +143,8 @@
             ];
             
             let progress = 0;   
+            
+            // Jede Erhöhung um 2% dauert jetzt 50 Millisekunden -> ca. 2.5 Sekunden Gesamtladezeit
             const interval = setInterval(() => {
                 progress += 2; 
                 if (bar) bar.style.width = progress + "%"; 
@@ -156,7 +160,7 @@
                         if (authScreen) authScreen.classList.remove('hidden');
                     }, 400);
                 }
-            }, 4000); // 4000ms Gesamtdauer, damit man die Nachrichten schön lesen kann
+            }, 50); 
         }
 
         function toggleAuth(showRegister) {
@@ -173,5 +177,3 @@
 
         function enterHangar() {
             document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('hangar-screen').classList.remove('hidden');
-            
