@@ -31,7 +31,7 @@
         .hud-block { text-align: center; }
         .credits { font-size: 24px; color: #00ffcc; font-weight: bold; }
         
-        /* 3D VIEWPORT (PERFEKTE SEITENANSICHT) */
+        /* 3D VIEWPORT */
         #canvas-container { 
             width: 100%; 
             height: 340px; 
@@ -53,7 +53,9 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
         }
     </style>
-    <!-- Three.js für das rotierende 3D-Schiff -->
+    <!-- KORREKTUR 1: Die Spieldatenbank HIER zuerst laden -->
+    <script src="database.js"></script>
+    <!-- KORREKTUR 2: Offizielle Three.js-Bibliothek für das 3D-Schiff verknüpfen -->
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
@@ -65,7 +67,7 @@
     <div class="hud">
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR</div>
-            <div class="credits" id="credit-display">2.390.000 💳</div>
+            <div class="credits" id="credit-display">0 💳</div>
         </div>
         <div class="hud-block">
             <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
@@ -80,11 +82,10 @@
     <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
 
     <script>
-        // Absolut krisensichere Startwerte direkt im Code verankert
+        // Nutzt jetzt die geladene DB aus database.js
         let credits = typeof DB !== 'undefined' ? DB.loadCredits() : 0; 
-        let mineSpeed = typeof DB !== 'undefined' ? DB.loadSpeed() : 100;
+        let mineSpeed = typeof DB !== 'undefined' ? DB.loadSpeed() : 900;
 
-        // Unfehlbare Update-Funktion für den Bildschirm
         function drawHUD() {
             const element = document.getElementById('credit-display');
             if (element) {
@@ -92,15 +93,19 @@
             }
         }
 
-        // Sobald das Dokument bereit ist, feuert die Mine los
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('speed-count').innerText = mineSpeed;
             drawHUD();
 
-            // Der unzerstörbare Sekundentakt der Krypto-Druckmaschine
+            // Der Sekundentakt der Mine
             setInterval(() => {
                 credits += mineSpeed;
                 drawHUD();
+                
+                // KORREKTUR 3: Spielstand jede Sekunde automatisch im localStorage sichern!
+                if (typeof DB !== 'undefined') {
+                    DB.saveGame(credits, mineSpeed);
+                }
             }, 1000);
         });
 
@@ -110,14 +115,15 @@
                 if (e.data.command === 'money') { credits += 1000000; }
                 if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; }
                 drawHUD();
+                // Direkt nach dem Cheat auch mitspeichern
+                if (typeof DB !== 'undefined') { DB.saveGame(credits, mineSpeed); }
             }
         });
 
-        // --- THREE.JS 3D ENGINE (PERFEKTE SEITENANSICHT) ---
+        // --- THREE.JS 3D ENGINE ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         
-        // Kamera wird seitlich auf die X-Achse gesetzt, um die Flanke des Kreuzers zu filmen
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
         camera.position.set(3.5, 0.3, 0); 
         camera.lookAt(0, 0, 0); 
@@ -126,16 +132,13 @@
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
 
-        // Scheinwerfer-Beleuchtung für die Flanken
         const light1 = new THREE.DirectionalLight(0xff5500, 2.0); light1.position.set(5, 3, 5); scene.add(light1);
         const light2 = new THREE.DirectionalLight(0x00ffcc, 1.0); light2.position.set(-5, 2, -3); scene.add(light2);
 
-        // Das schwebende Geometrie-Schiff (Kegel-Form)
         const geometry = new THREE.ConeGeometry(0.5, 2.0, 4);
         const material = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.4, metalness: 0.8 });
         const ship = new THREE.Mesh(geometry, material);
         
-        // Das Schiff flach in den Raum legen, damit die Spitze nach vorne zeigt
         ship.rotation.x = Math.PI / 2; 
         scene.add(ship);
 
@@ -143,16 +146,13 @@
         function renderLoop() {
             requestAnimationFrame(renderLoop);
             if (ship) {
-                // Sanfte Drehung um die eigene Hochachse
                 ship.rotation.z += 0.005; 
-                // Elegantes Auf- und Ab-Schweben wie im Hangar-Standby
                 ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.06; 
             }
             renderer.render(scene, camera);
         }
         renderLoop();
 
-        // Automatische Größenanpassung bei Fensterwechsel
         window.addEventListener('resize', () => {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
