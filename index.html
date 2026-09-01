@@ -33,9 +33,20 @@
                     document.getElementById('loading-screen').classList.add('hidden');
                     document.getElementById('auth-screen').classList.remove('hidden');
                     
-                    // Falls schon Accounts existieren, direkt die Login-Box statt Registrierung zeigen
-                    if (localStorage.length > 0) {
-                        toggleAuth(false);
+                    // KORREKTUR: Prüfe gezielt, ob ein Passwort-Schlüssel existiert (statt localStorage.length)
+                    // Das verhindert den "White Screen" Fehler!
+                    let hasAccounts = false;
+                    for (let i = 0; i < localStorage.length; i++) {
+                        if (localStorage.key(i).startsWith('dc_password_')) {
+                            hasAccounts = true;
+                            break;
+                        }
+                    }
+
+                    if (hasAccounts) {
+                        toggleAuth(false); // Zeige direkt den Login, falls Accounts existieren
+                    } else {
+                        toggleAuth(true);  // Zeige die Registrierung, falls alles leer ist
                     }
                 }
             }, 50); // Regelt die Ladegeschwindigkeit am Anfang
