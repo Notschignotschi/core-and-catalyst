@@ -51,15 +51,19 @@
 </head>
 <body>
 
-    <!-- PHASE 1: INITIALER LADEBILDSCHIRM -->
+    <!-- PHASE 1: HIER IST DEIN LADEBILDSCHIRM (HTML-SKELETT) -->
     <div id="loading-screen" class="screen">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         <h3 id="load-status" style="color: #ff6600; letter-spacing: 1px; text-transform: uppercase;">VERBINDE MIT DEM SERVER-ZENTRUM...</h3>
-        <div class="progress-bar-container"><div id="bar" class="progress-bar"></div></div>
+        <!-- Das hier ist der Container für den Ladebalken -->
+        <div class="progress-bar-container">
+            <!-- Das hier ('id="bar"') ist der Balken, den wir mit JavaScript füllen! -->
+            <div id="bar" class="progress-bar"></div>
+        </div>
         <p style="color: #555; font-style: italic; font-size: 14px;">Lade Interface-Skins, Triebwerks-Shader und Login-Netzwerkknoten...</p>
     </div>
 
-    <!-- PHASE 2: TERMINAL (WIRD ERST NACH DEM LADEN SICHTBAR) -->
+    <!-- PHASE 2: TERMINAL (DAS WIRD PER JAVASCRIPT SICHTBAR GEMACHT) -->
     <div id="auth-screen" class="screen hidden">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         
@@ -82,17 +86,18 @@
         </div>
     </div>
 
+    <!-- 🧠 DAS HIER IST DAS GEHIRN (JAVASCRIPT) - ES ERWECKT DEN BALKEN ZUM LEBEN -->
     <script>
-        // Startet das System, sobald die Seite im Browser bereit ist
-        window.addEventListener('DOMContentLoaded', () => {
-            startInitialLoading();
-        });
+        // Krisensicherer Sofortstart: Wir rufen die Ladefunktion direkt auf!
+        startInitialLoading();
 
-        // Funktion für den Ladebalken
         function startInitialLoading() {
+            // JavaScript sucht im HTML nach der ID 'load-status' (dein Text)
             const statusText = document.getElementById('load-status');
+            // JavaScript sucht im HTML nach der ID 'bar' (dein Ladebalken)
             const bar = document.getElementById('bar');
             
+            // Die Texte, die beim Laden durchwechseln sollen
             const steps = [
                 "LADE INTERFACE-ELEMENTE...",
                 "INITIALISIERE QUANTEN-NETZWERK...",
@@ -101,26 +106,36 @@
                 "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
             ];
             
-            let progress = 0; 
-            let stepIndex = 0;
+            let progress = 0;   // Wir starten bei 0% Fortschritt
+            let stepIndex = 0;  // Wir starten beim ersten Text in der Liste
             
+            // Eine Zeitschleife, die alle 10 Millisekunden (= blitzschnell) feuert
             const interval = setInterval(() => {
-                progress += 2; 
-                bar.style.width = progress + "%";
+                progress += 2; // Erhöhe den Fortschritt bei jedem kleinen Tick um 2%
                 
+                // Hier verändern wir die Breite des HTML-Balkens!
+                if (bar) {
+                    bar.style.width = progress + "%"; 
+                }
+                
+                // Alle 22% ändern wir den Text im HTML
                 if (progress % 22 === 0 && stepIndex < steps.length) { 
-                    statusText.innerText = steps[stepIndex]; 
+                    if (statusText) {
+                        statusText.innerText = steps[stepIndex]; // Schreibt den neuen Text rein
+                    }
                     stepIndex++; 
                 }
                 
+                // Sobald 100% erreicht sind, stoppen wir das Laden
                 if (progress >= 100) { 
-                    clearInterval(interval); 
+                    clearInterval(interval); // Stoppt diese Zeitschleife
                     
-                    // KORREKTUR: Wir blenden erst den Ladescreen aus und schalten das Hauptfenster sichtbar!
+                    // Jetzt verstecken wir den Ladebildschirm im HTML
                     document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('auth-screen').classList.remove('hidden'); // Macht das Hauptfenster SICHTBAR
+                    // Und machen das Terminal-Hauptfenster sichtbar!
+                    document.getElementById('auth-screen').classList.remove('hidden');
                     
-                    // Prüfen, ob Passwörter existieren, um direkt das Login zu zeigen
+                    // Prüfen, ob Passwörter im Speicher existieren
                     let hasAccounts = false;
                     for (let i = 0; i < localStorage.length; i++) {
                         if (localStorage.key(i).startsWith('dc_password_')) {
@@ -129,55 +144,32 @@
                         }
                     }
 
-                    // Schaltet die richtige Box ein
+                    // Deine pure Logik entscheidet, welche Box wir sehen wollen
                     if (hasAccounts) {
                         toggleAuth(false); // Zeige direkt den Login
                     } else {
                         toggleAuth(true);  // Zeige die Registrierung
                     }
                 }
-            }, 50);
+            }, 10); // Die '10' sorgt dafür, dass es superschnell lädt!
         }
 
-        // DEINE LOGIK-FUNKTION (Steuert jetzt sauber die inneren Boxen an)
+        // Steuert, ob Registrierung oder Login sichtbar ist (Deine If-Else Logik)
         function toggleAuth(showRegister) {
-            // WICHTIG: Wir stellen sicher, dass das Haupt-Terminal-Fenster auf jeden Fall sichtbar ist!
             document.getElementById('auth-screen').classList.remove('hidden');
 
             if (showRegister === true) {
-                // Wir wollen die Registrierung SEHEN
-                document.getElementById('register-box').classList.remove('hidden'); // NICHT verstecken
-                document.getElementById('login-box').classList.add('hidden');       // Verstecken
+                document.getElementById('register-box').classList.remove('hidden'); // Registrierung zeigen
+                document.getElementById('login-box').classList.add('hidden');       // Login verstecken
             } else {
-                // Wir wollen den Login SEHEN
-                document.getElementById('register-box').classList.add('hidden');    // Verstecken
-                document.getElementById('login-box').classList.remove('hidden');    // NICHT verstecken
+                document.getElementById('register-box').classList.add('hidden');    // Registrierung verstecken
+                document.getElementById('login-box').classList.remove('hidden');    // Login zeigen
             }
         }
 
-        // Funktion für die Registrierung
+        // Wird aufgerufen, wenn man auf "ACCOUNT ANLEGEN" klickt
         function handleRegister() {
             const user = document.getElementById('reg-user').value.trim();
             const code = document.getElementById('reg-code').value.trim();
             
             if (!user || !code) return alert("Felder ausfüllen!");
-            
-            if (localStorage.getItem('dc_password_' + user)) return alert("Name vergeben!");
-        
-            localStorage.setItem('dc_password_' + user, code);
-            alert("Account erfolgreich angelegt!");
-            toggleAuth(false); // Schaltet auf Login um
-        }
-
-        // Funktion für den Login
-        function handleLogin() {
-            const user = document.getElementById('login-user').value.trim();
-            const code = document.getElementById('login-code').value.trim();
-            
-            if (!user || !code) return alert("Felder ausfüllen!");
-
-            const savedCode = localStorage.getItem('dc_password_' + user);
-
-            if (savedCode && savedCode === code) {
-                sessionStorage.setItem('active_commander', user);
-                alert("Zugang gewährt! Weiterleitung zum Hangar...");
