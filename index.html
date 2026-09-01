@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <!-- PHASE 3: NEU HINZUGEFÜGT - DER HANGAR-SCREEN -->
+    <!-- PHASE 3: DER HANGAR-SCREEN -->
     <div id="hangar-screen" class="screen hidden">
         <div class="title-container"><span class="lava-text">CORE</span><span class="crystal-symbol">💠</span><span class="lava-text">CATALYST</span></div>
         <div class="hangar-box">
@@ -152,36 +152,39 @@
             }
         }
 
-        // NEU: Diese Funktion leitet dich in den Hangar weiter
         function enterHangar(username) {
-            const authScreen = document.getElementById('auth-screen');
-            const hangarScreen = document.getElementById('hangar-screen');
-            const displayName = document.getElementById('commander-display');
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('hangar-screen').classList.remove('hidden');
+            document.getElementById('commander-display').innerText = username;
+        }
 
-            if(displayName && username) {
-                displayName.innerText = username; // Setzt den Namen im Hangar ein
+        // NEU: Holt die Account-Datenbank aus dem Speicher oder erstellt eine neue
+        function getAccounts() {
+            const accounts = localStorage.getItem('cc_accounts');
+            return accounts ? JSON.parse(accounts) : {};
+        }
+
+        // NEU: Registrierungs-Logik mit Speicherung
+        function handleRegister() { 
+            const username = document.getElementById('reg-user').value.trim();
+            const code = document.getElementById('reg-code').value;
+
+            if(!username || !code) {
+                return alert("Bitte fülle alle Felder aus!");
             }
 
-            if(authScreen) authScreen.classList.add('hidden');
-            if(hangarScreen) hangarScreen.classList.remove('hidden');
-        }
+            const accounts = getAccounts();
 
-        function handleRegister() { 
-            const username = document.getElementById('reg-user').value;
-            if(!username) return alert("Bitte einen Commander-Namen eingeben!");
-            enterHangar(username); 
-        }
+            // Prüfen, ob der Name schon vergeben ist
+            if (accounts[username.toLowerCase()]) {
+                return alert("Dieser Commander-Name ist bereits registriert!");
+            }
 
-        function handleLogin() { 
-            const username = document.getElementById('login-user').value;
-            if(!username) return alert("Bitte einen Commander-Namen eingeben!");
-            enterHangar(username); 
-        }
+            // Account speichern
+            accounts[username.toLowerCase()] = {
+                name: username,
+                password: code
+            };
+            localStorage.setItem('cc_accounts', JSON.stringify(accounts));
 
-        function logout() {
-            document.getElementById('hangar-screen').classList.add('hidden');
-            document.getElementById('auth-screen').classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+            alert("Account erfolgreich im Allianz-Register gespeichert!");
