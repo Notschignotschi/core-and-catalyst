@@ -83,20 +83,16 @@
     </div>
 
     <script>
-        // Wartet, bis die Webseite im Browser komplett bereitsteht
+        // Startet das System, sobald die Seite im Browser bereit ist
         window.addEventListener('DOMContentLoaded', () => {
-            // Startet sofort die Funktion für den Ladebalken
             startInitialLoading();
         });
 
-        // Funktion, die das Laden simuliert und den Balken füllt
+        // Funktion für den Ladebalken
         function startInitialLoading() {
-            // Holt sich den Text über dem Ladebalken aus dem HTML
             const statusText = document.getElementById('load-status');
-            // Holt sich den eigentlichen grünen Ladebalken aus dem HTML
             const bar = document.getElementById('bar');
             
-            // Eine Liste mit Fun-Texten, die nacheinander angezeigt werden
             const steps = [
                 "LADE INTERFACE-ELEMENTE...",
                 "INITIALISIERE QUANTEN-NETZWERK...",
@@ -105,58 +101,83 @@
                 "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
             ];
             
-            let progress = 0;   // Start-Prozentzahl des Ladebalkens
-            let stepIndex = 0;  // Zeiger, welcher Text aus der Liste oben gerade dran ist
+            let progress = 0; 
+            let stepIndex = 0;
             
-            // Erstellt eine Zeitschleife, die alle 50 Millisekunden abläuft
             const interval = setInterval(() => {
-                progress += 2; // Erhöhe den Ladefortschritt bei jedem Durchlauf um 2%
-                bar.style.width = progress + "%"; // Passt die optische Breite des Balkens im HTML an
+                progress += 2; 
+                bar.style.width = progress + "%";
                 
-                // Alle 22% wechseln wir den Text über dem Balken
                 if (progress % 22 === 0 && stepIndex < steps.length) { 
-                    statusText.innerText = steps[stepIndex]; // Schreibt den neuen Text ins HTML
-                    stepIndex++; // Geht in der Text-Liste einen Schritt weiter
+                    statusText.innerText = steps[stepIndex]; 
+                    stepIndex++; 
                 }
                 
-                // Wenn der Ladebalken bei 100% oder mehr angekommen ist
                 if (progress >= 100) { 
-                    clearInterval(interval); // Stoppt die Zeitschleife, damit sie nicht ewig weiterläuft
+                    clearInterval(interval); 
                     
-                    // Versteckt den kompletten Ladebildschirm (fügt CSS-Klasse 'hidden' hinzu)
+                    // KORREKTUR: Wir blenden erst den Ladescreen aus und schalten das Hauptfenster sichtbar!
                     document.getElementById('loading-screen').classList.add('hidden');
-                    // Macht den Anmelde-Bildschirm sichtbar (entfernt CSS-Klasse 'hidden')
-                    document.getElementById('auth-screen').classList.remove('hidden');
+                    document.getElementById('auth-screen').classList.remove('hidden'); // Macht das Hauptfenster SICHTBAR
                     
-                    // Wir prüfen nun, ob überhaupt schon Accounts auf diesem PC existieren
+                    // Prüfen, ob Passwörter existieren, um direkt das Login zu zeigen
                     let hasAccounts = false;
-                    // Wir wandern durch den gesamten Speicher des Browsers (localStorage)
                     for (let i = 0; i < localStorage.length; i++) {
-                        // Wenn ein gespeicherter Name mit 'dc_password_' beginnt, gibt es einen Account
                         if (localStorage.key(i).startsWith('dc_password_')) {
-                            hasAccounts = true; // Wir merken uns: Ja, es gibt Accounts!
-                            break; // Suche abbrechen, wir wissen genug
+                            hasAccounts = true;
+                            break;
                         }
                     }
 
-                    // Deine pure Logik-Entscheidung:
+                    // Schaltet die richtige Box ein
                     if (hasAccounts) {
-                        toggleAuth(false); // Es gibt Accounts? Zeige direkt die Login-Box!
+                        toggleAuth(false); // Zeige direkt den Login
                     } else {
-                        toggleAuth(true);  // Alles leer? Zeige zuerst das Registrierungs-Fenster!
+                        toggleAuth(true);  // Zeige die Registrierung
                     }
                 }
-            }, 100); // Die Zahl 50 bestimmt das Tempo (niedriger = schneller)
+            }, 50);
         }
 
-        // DEINE PURE LOGIK-FUNKTION: Schaltet zwischen Registrierung und Login um
+        // DEINE LOGIK-FUNKTION (Steuert jetzt sauber die inneren Boxen an)
         function toggleAuth(showRegister) {
+            // WICHTIG: Wir stellen sicher, dass das Haupt-Terminal-Fenster auf jeden Fall sichtbar ist!
+            document.getElementById('auth-screen').classList.remove('hidden');
+
             if (showRegister === true) {
-                // Wenn showRegister wahr ist, wollen wir die Registrierung sehen
-                document.getElementById('register-box').classList.remove('hidden'); // Box einblenden
-                document.getElementById('login-box').classList.add('hidden');       // Login ausblenden
+                // Wir wollen die Registrierung SEHEN
+                document.getElementById('register-box').classList.remove('hidden'); // NICHT verstecken
+                document.getElementById('login-box').classList.add('hidden');       // Verstecken
             } else {
-                // Wenn showRegister falsch ist, wollen wir den Login sehen
-                document.getElementById('register-box').classList.add('hidden');    // Box ausblenden
-                document.getElementById('login-box').classList.remove('hidden');    // Login einblenden
+                // Wir wollen den Login SEHEN
+                document.getElementById('register-box').classList.add('hidden');    // Verstecken
+                document.getElementById('login-box').classList.remove('hidden');    // NICHT verstecken
             }
+        }
+
+        // Funktion für die Registrierung
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            
+            if (!user || !code) return alert("Felder ausfüllen!");
+            
+            if (localStorage.getItem('dc_password_' + user)) return alert("Name vergeben!");
+        
+            localStorage.setItem('dc_password_' + user, code);
+            alert("Account erfolgreich angelegt!");
+            toggleAuth(false); // Schaltet auf Login um
+        }
+
+        // Funktion für den Login
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const code = document.getElementById('login-code').value.trim();
+            
+            if (!user || !code) return alert("Felder ausfüllen!");
+
+            const savedCode = localStorage.getItem('dc_password_' + user);
+
+            if (savedCode && savedCode === code) {
+                sessionStorage.setItem('active_commander', user);
+                alert("Zugang gewährt! Weiterleitung zum Hangar...");
