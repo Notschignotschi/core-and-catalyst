@@ -99,12 +99,31 @@
         </div>
     </div>
 
-    <!-- Hier binden wir deine bestehende Datenbank-Datei ein -->
-    <script src="database.js"></script>
-
-    <!-- UI & Login Logik -->
+    <!-- ALLES IN EINEM: DEINE INTERNE CLOUD- & UI-LOGIK -->
     <script>
-        // Krisensicherer Sofortstart des Ladebalkens:
+        // 📡 DEIN ORIGINALER CODE AUS DATABASE.JS DIREKT INTEGRIERT
+        const DB = {
+            getActiveCommander: function() {
+                return sessionStorage.getItem('active_commander') || "Gast_Commander";
+            },
+            loadCredits: function() {
+                const commander = this.getActiveCommander();
+                const saved = localStorage.getItem('dc_credits_' + commander);
+                return saved !== null ? parseInt(saved) : 0;
+            },
+            loadSpeed: function() {
+                const commander = this.getActiveCommander();
+                const saved = localStorage.getItem('dc_speed_' + commander);
+                return saved !== null ? parseInt(saved) : 900;
+            },
+            saveGame: function(credits, speed) {
+                const commander = this.getActiveCommander();
+                localStorage.setItem('dc_credits_' + commander, credits);
+                localStorage.setItem('dc_speed_' + commander, speed);
+            }
+        };
+
+        // 🚀 SOFORTIGER START DES LADEBALKENS (Nichts kann es mehr blockieren!)
         startInitialLoading();
 
         function startInitialLoading() {
@@ -137,7 +156,7 @@
                         if (authScreen) authScreen.classList.remove('hidden');
                     }, 400);
                 }
-            }, 60); 
+            }, 4000); // 4000ms Gesamtdauer, damit man die Nachrichten schön lesen kann
         }
 
         function toggleAuth(showRegister) {
@@ -156,23 +175,3 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('hangar-screen').classList.remove('hidden');
             
-            // Fehlerschutz: Falls DB (aus database.js) nicht geladen werden konnte, nutzen wir Ausweichwerte
-            if (typeof DB !== 'undefined') {
-                document.getElementById('commander-display').innerText = DB.getActiveCommander();
-                document.getElementById('credits-display').innerText = DB.loadCredits();
-                document.getElementById('speed-display').innerText = DB.loadSpeed();
-            } else {
-                console.error("database.js wurde nicht gefunden oder blockiert!");
-                document.getElementById('commander-display').innerText = sessionStorage.getItem('active_commander') || "Commander";
-            }
-        }
-
-        function getLocalAccounts() {
-            const saved = localStorage.getItem('cc_auth_database');
-            return saved ? JSON.parse(saved) : {};
-        }
-
-        function handleRegister() { 
-            const username = document.getElementById('reg-user').value.trim();
-            const code = document.getElementById('reg-code').value;
-
