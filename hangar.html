@@ -1,163 +1,79 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core & Catalyst - Hangar</title>
-    <style>
-        body { 
-            background-color: #05060a; 
-            color: #e6e6e6; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            text-align: center; 
-        }
-        h2 { color: #ff6600; text-shadow: 0 0 10px rgba(255, 102, 0, 0.4); margin: 0 0 5px 0; letter-spacing: 1px; }
-        
-        /* LIVE HUD */
-        .hud { 
-            background-color: #0f111a; 
-            border: 2px solid #00ffcc; 
-            border-radius: 10px; 
-            padding: 12px; 
-            max-width: 700px; 
-            margin: 0 auto 15px auto; 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); 
-        }
-        .hud-block { text-align: center; }
-        .credits { font-size: 24px; color: #00ffcc; font-weight: bold; }
-        
-        /* 3D VIEWPORT */
-        #canvas-container { 
-            width: 100%; 
-            height: 340px; 
-            background: radial-gradient(circle, #141724 0%, #07080c 100%); 
-            margin: 0 auto 15px auto; 
-            max-width: 700px; 
-            border-radius: 10px; 
-            border: 1px solid #333; 
-        }
-        
-        .chat-frame { 
-            width: 100%; 
-            max-width: 700px; 
-            height: 180px; 
-            border: 1px solid #333; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            background-color: #0f111a; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
-        }
-    </style>
-    <!-- KORREKTUR 1: Die Spieldatenbank HIER zuerst laden -->
-    <script src="database.js"></script>
-    <!-- KORREKTUR 2: Offizielle Three.js-Bibliothek für das 3D-Schiff verknüpfen -->
-    <script src="https://cloudflare.com"></script>
-</head>
-<body>
-
-    <h2>🛰️ RECHNER-HANGAR & GEFECHTSBRÜCKE</h2>
-    <p style="margin: 0 0 15px 0; font-size: 14px; color: #aaa;">Sektor-Flugstatus: <span style="color:#00ffcc; font-weight:bold;">Aktiv</span> 👑</p>
-
-    <!-- LIVE HUD -->
-    <div class="hud">
-        <div class="hud-block">
-            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">KRYPTO-TRESOR</div>
-            <div class="credits" id="credit-display">0 💳</div>
-        </div>
-        <div class="hud-block">
-            <div style="font-size: 10px; color: #666; letter-spacing: 0.5px;">MINEN-PRODUKTION</div>
-            <div style="color: #ff6600; font-weight: bold; font-size: 18px;">+<span id="speed-count">900</span> / Sek</div>
-        </div>
-    </div>
-
-    <!-- HANGAR VIEWPORT FOR 3D MODEL -->
-    <div id="canvas-container"></div>
-
-    <!-- CHAT WINDOW FRAME -->
-    <iframe src="chat.html" class="chat-frame" id="chat-window"></iframe>
-
     <script>
-        // Nutzt jetzt die geladene DB aus database.js
-        let credits = typeof DB !== 'undefined' ? DB.loadCredits() : 0; 
-        let mineSpeed = typeof DB !== 'undefined' ? DB.loadSpeed() : 900;
-
-        function drawHUD() {
-            const element = document.getElementById('credit-display');
-            if (element) {
-                element.innerText = credits.toLocaleString('de-DE') + " 💳";
-            }
-        }
-
+        // Sobald die Website lädt, startet SOFORT der Ladebalken
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('speed-count').innerText = mineSpeed;
-            drawHUD();
+            startInitialLoading();
+        });
 
-            // Der Sekundentakt der Mine
-            setInterval(() => {
-                credits += mineSpeed;
-                drawHUD();
+        function startInitialLoading() {
+            const statusText = document.getElementById('load-status');
+            const bar = document.getElementById('bar');
+            const steps = [
+                "LADE INTERFACE-ELEMENTE...",
+                "INITIALISIERE QUANTEN-NETZWERK...",
+                "SYNCHRONISIERE REAKTIVE SPIEGELUNG...",
+                "ÖFFNE INTEGRITÄTS-ZUGANG...",
+                "NETZWERK BEREIT. INITIALISIERE LOGIN-SYSTEM!"
+            ];
+            
+            let progress = 0; 
+            let stepIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += 2; 
+                bar.style.width = progress + "%";
                 
-                // KORREKTUR 3: Spielstand jede Sekunde automatisch im localStorage sichern!
-                if (typeof DB !== 'undefined') {
-                    DB.saveGame(credits, mineSpeed);
+                if (progress % 22 === 0 && stepIndex < steps.length) { 
+                    statusText.innerText = steps[stepIndex]; 
+                    stepIndex++; 
                 }
-            }, 1000);
-        });
-
-        // Cheat-Brücke für Admin-Befehle aus dem Chat
-        window.addEventListener('message', function(e) {
-            if(e.data.type === 'CHEAT') {
-                if (e.data.command === 'money') { credits += 1000000; }
-                if (e.data.command === 'speed') { mineSpeed = 50000; document.getElementById('speed-count').innerText = mineSpeed; }
-                drawHUD();
-                // Direkt nach dem Cheat auch mitspeichern
-                if (typeof DB !== 'undefined') { DB.saveGame(credits, mineSpeed); }
-            }
-        });
-
-        // --- THREE.JS 3D ENGINE ---
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(3.5, 0.3, 0); 
-        camera.lookAt(0, 0, 0); 
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        const light1 = new THREE.DirectionalLight(0xff5500, 2.0); light1.position.set(5, 3, 5); scene.add(light1);
-        const light2 = new THREE.DirectionalLight(0x00ffcc, 1.0); light2.position.set(-5, 2, -3); scene.add(light2);
-
-        const geometry = new THREE.ConeGeometry(0.5, 2.0, 4);
-        const material = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.4, metalness: 0.8 });
-        const ship = new THREE.Mesh(geometry, material);
-        
-        ship.rotation.x = Math.PI / 2; 
-        scene.add(ship);
-
-        let clock = new THREE.Clock();
-        function renderLoop() {
-            requestAnimationFrame(renderLoop);
-            if (ship) {
-                ship.rotation.z += 0.005; 
-                ship.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.06; 
-            }
-            renderer.render(scene, camera);
+                
+                if (progress >= 100) { 
+                    clearInterval(interval); 
+                    // Laden beendet! Wir blenden den Ladescreen aus und das Login-Terminal ein!
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    
+                    // Falls schon Accounts existieren, direkt die Login-Box statt Registrierung zeigen
+                    if (localStorage.length > 0) {
+                        toggleAuth(false);
+                    }
+                }
+            }, 50); // Regelt die Ladegeschwindigkeit am Anfang
         }
-        renderLoop();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
+        function toggleAuth(showRegister) {
+            document.getElementById('register-box').classList.toggle('hidden', !showRegister);
+            document.getElementById('login-box').classList.toggle('hidden', showRegister);
+        }
+
+        function handleRegister() {
+            const user = document.getElementById('reg-user').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            if (!user || !code) return alert("Felder ausfüllen!");
+            
+            // KORREKTUR: Wir nutzen den exakten Datenbrücken-Schlüssel für die DB!
+            if (localStorage.getItem('dc_password_' + user)) return alert("Name vergeben!");
+        
+            localStorage.setItem('dc_password_' + user, code); // Passwort in der DB verankern
+            alert("Account erfolgreich angelegt!");
+            toggleAuth(false);
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const code = document.getElementById('login-code').value.trim();
+            if (!user || !code) return alert("Felder ausfüllen!");
+
+            // Holt das gespeicherte Passwort aus dem Speicher
+            const savedCode = localStorage.getItem('dc_password_' + user);
+
+            if (savedCode && savedCode === code) {
+                alert("Zugang gewährt! Weiterleitung zum Hangar...");
+                window.location.href = "hangar.html"; // Leitet den Spieler weiter
+            } else {
+                alert("Commander-Name oder Zugangs-Code falsch!");
+            }
+        }
     </script>
 </body>
 </html>
