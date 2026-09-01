@@ -104,6 +104,7 @@
 
     <!-- UI & Login Logik -->
     <script>
+        // Krisensicherer Sofortstart des Ladebalkens:
         startInitialLoading();
 
         function startInitialLoading() {
@@ -151,29 +152,27 @@
             }
         }
 
-        // Lädt die Daten des Commanders und schaltet das Hangar-UI frei
         function enterHangar() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('hangar-screen').classList.remove('hidden');
             
-            // Name und geladene Werte aus der database.js im UI eintragen
-            document.getElementById('commander-display').innerText = DB.getActiveCommander();
-            document.getElementById('credits-display').innerText = DB.loadCredits();
-            document.getElementById('speed-display').innerText = DB.loadSpeed();
+            // Fehlerschutz: Falls DB (aus database.js) nicht geladen werden konnte, nutzen wir Ausweichwerte
+            if (typeof DB !== 'undefined') {
+                document.getElementById('commander-display').innerText = DB.getActiveCommander();
+                document.getElementById('credits-display').innerText = DB.loadCredits();
+                document.getElementById('speed-display').innerText = DB.loadSpeed();
+            } else {
+                console.error("database.js wurde nicht gefunden oder blockiert!");
+                document.getElementById('commander-display').innerText = sessionStorage.getItem('active_commander') || "Commander";
+            }
         }
 
-        // Hilfsfunktion: Holt die Accountliste für die Registrierung/Login-Prüfung
         function getLocalAccounts() {
             const saved = localStorage.getItem('cc_auth_database');
             return saved ? JSON.parse(saved) : {};
         }
 
-        // Registrierungs-Logik
         function handleRegister() { 
             const username = document.getElementById('reg-user').value.trim();
             const code = document.getElementById('reg-code').value;
 
-            if(!username || !code) return alert("Bitte alle Felder ausfüllen!");
-
-            const accounts = getLocalAccounts();
-            if(accounts[username.toLowerCase()]) {
