@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Core & Catalyst - Start-Terminal</title>
-    <style>
+   <style>
         @keyframes lavaGlow {
             0% { text-shadow: 0 0 10px #ff3300, 0 0 20px #ff6600, 0 0 30px #ff9900; color: #ff3300; }
             50% { text-shadow: 0 0 20px #ff6600, 0 0 40px #ff9900, 0 0 60px #ffcc00; color: #ff9900; }
@@ -36,7 +36,15 @@
         
         /* LADEBALKEN STYLE */
         .progress-bar-container { width: 80%; height: 6px; background-color: #161824; border-radius: 3px; margin: 30px auto; overflow: hidden; border: 1px solid #333; }
-        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; transition: width 0.05s linear; }
+        
+        /* HIER WURDE DIE ANIMATION HINZUGEFÜGT: */
+        .progress-bar { width: 0%; height: 100%; background-color: #00ffcc; box-shadow: 0 0 10px #00ffcc; animation: automatischesLaden 3s linear infinite; }
+        
+        /* DIESE REGEL IST NEU HINZUGEKOMMEN: */
+        @keyframes automatischesLaden {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
         
         /* LOGIN & REGISTRIERUNGS BOXEN */
         .auth-box { background-color: #0f111a; border: 2px solid #333; border-radius: 12px; padding: 30px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); max-width: 400px; margin: 0 auto; }
@@ -47,7 +55,7 @@
         .btn { background-color: #ff6600; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
         .btn:hover { background-color: #ff8533; transform: translateY(-2px); }
         .switch-link { color: #00ffcc; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; font-size: 14px; }
-    </style>
+    </style> 
 </head>
 <body>
 
